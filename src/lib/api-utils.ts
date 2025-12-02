@@ -138,6 +138,7 @@ interface WrapperConfig<TSchema extends z.ZodTypeAny = z.ZodTypeAny> {
   requireRole?: Role;
   requirePermission?: Permission;
   requirePermissions?: Permission[];
+  params?: Promise<Record<string, string>>;
 }
 
 // Helper function to get user from request
@@ -210,6 +211,7 @@ async function getUserFromRequest(
 export interface HandlerContext<TBody = unknown> {
   auth?: AuthenticatedUser;
   body: TBody;
+  params?: Record<string, string>;
 }
 
 // API Handler type
@@ -241,7 +243,11 @@ export async function wrapper<T = unknown, TSchema extends z.ZodTypeAny = any>(
       requireRole,
       requirePermission,
       requirePermissions,
+      params,
     } = config;
+
+    // Await params if provided
+    const resolvedParams = params ? await params : undefined;
 
     // Always try to get authenticated user (even if not required)
     let authenticatedUser: AuthenticatedUser | undefined;
@@ -289,6 +295,7 @@ export async function wrapper<T = unknown, TSchema extends z.ZodTypeAny = any>(
     > = {
       auth: authenticatedUser,
       body: {} as any,
+      params: resolvedParams,
     };
 
     // If parser is provided, parse and validate the request body
