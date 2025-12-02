@@ -1,5 +1,5 @@
-import { RoleModel, RoleMutations } from "./models/Role.model";
-import { Permission, Role, RolePermissions } from "../rbac/permissions";
+import { RoleModel, RoleMutations, RoleQueries } from "./models/Role.model";
+import { Permission, Role, SystemRolePermissions } from "../rbac/permissions";
 
 /**
  * Initialize default system roles in the database
@@ -18,6 +18,7 @@ export async function initializeSystemRoles() {
       name: Role.SUPER_ADMIN,
       description: "Super Administrator with all permissions",
       permissions: Object.values(Permission),
+      hierarchyLevel: 4,
       isSystem: true,
     });
     console.log("✓ SUPER_ADMIN role created");
@@ -36,7 +37,8 @@ export async function initializeSystemRoles() {
     await RoleMutations.createRole({
       name: Role.USER,
       description: "Default user role",
-      permissions: RolePermissions[Role.USER],
+      permissions: SystemRolePermissions[Role.USER],
+      hierarchyLevel: 1,
       isSystem: true,
     });
     console.log("✓ USER role created");
@@ -50,7 +52,8 @@ export async function initializeSystemRoles() {
     await RoleMutations.createRole({
       name: Role.ADMIN,
       description: "Administrator role",
-      permissions: RolePermissions[Role.ADMIN],
+      permissions: SystemRolePermissions[Role.ADMIN],
+      hierarchyLevel: 3,
       isSystem: true,
     });
     console.log("✓ ADMIN role created");

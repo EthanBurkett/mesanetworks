@@ -10,13 +10,22 @@ export class Role {
 
   @field({ type: String, required: true })
   @unique()
-  name!: RoleEnum;
+  name!: string;
 
   @field({ type: String })
   description?: string;
 
   @field({ type: [String], default: [] })
   permissions!: Permission[];
+
+  @field({ type: Number, default: 0 })
+  hierarchyLevel!: number; // Lower number = lower privilege, used for drag-and-drop UI ordering
+
+  @field({ type: Boolean, default: false })
+  inherits!: boolean; // Whether this role inherits permissions from other roles
+
+  @field({ type: [String], default: [] })
+  inheritsFrom!: string[]; // Role IDs to inherit from. If empty and inherits=true, inherits from all roles with lower hierarchyLevel
 
   @field({ type: Boolean, default: true })
   isActive!: boolean;
@@ -50,7 +59,37 @@ export class RoleQueries {
     if (!role) {
       throw new Errors.NotFound("Role not found");
     }
-    return role.permissions;
+
+    const permissions = new Set<Permission>(role.permissions);
+
+    // Handle inheritance
+    if (role.inherits) {
+      let rolesToInheritFrom: Role[];
+
+      if (role.inheritsFrom && role.inheritsFrom.length > 0) {
+        // Inherit from specific roles
+        rolesToInheritFrom = await RoleModel.find({
+          _id: { $in: role.inheritsFrom },
+          isActive: true,
+        }).exec();
+      } else {
+        // Inherit from all roles with lower hierarchyLevel
+        rolesToInheritFrom = await RoleModel.find({
+          hierarchyLevel: { $lt: role.hierarchyLevel },
+          isActive: true,
+        }).exec();
+      }
+
+      // Recursively get permissions from inherited roles
+      for (const inheritedRole of rolesToInheritFrom) {
+        const inheritedPermissions = await this.getPermissionsForRole(
+          inheritedRole._id
+        );
+        inheritedPermissions.forEach((p) => permissions.add(p));
+      }
+    }
+
+    return Array.from(permissions);
   }
 
   static async getPermissionsForRoles(
@@ -70,6 +109,9 @@ export class RoleMutations {
     name: RoleEnum;
     description?: string;
     permissions: Permission[];
+    hierarchyLevel?: number;
+    inherits?: boolean;
+    inheritsFrom?: string[];
     isSystem?: boolean;
   }) {
     const existing = await RoleModel.findOne({ name: data.name }).exec();
@@ -81,6 +123,9 @@ export class RoleMutations {
       name: data.name,
       description: data.description,
       permissions: data.permissions,
+      hierarchyLevel: data.hierarchyLevel ?? 0,
+      inherits: data.inherits ?? false,
+      inheritsFrom: data.inheritsFrom ?? [],
       isSystem: data.isSystem || false,
     });
 
@@ -92,6 +137,9 @@ export class RoleMutations {
     data: {
       description?: string;
       permissions?: Permission[];
+      hierarchyLevel?: number;
+      inherits?: boolean;
+      inheritsFrom?: string[];
     }
   ) {
     const role = await RoleModel.findById(roleId).exec();

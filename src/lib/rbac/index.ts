@@ -1,14 +1,18 @@
 // Main RBAC exports
 export { Permission, Role } from "./permissions";
 export type {} from "./permissions";
+export { isPermission, isRole } from "./permissions";
+
+// Database role utilities
 export {
-  getPermissionsForRole,
-  getPermissionsForRoles,
-  roleHasPermission,
-  rolesHavePermission,
-  isPermission,
-  isRole,
-} from "./permissions";
+  getUserPermissions,
+  getRoleHierarchyLevel,
+  roleIsAtLeast,
+  updateRoleHierarchy,
+  getRolesByHierarchy,
+  getInheritedRoles,
+  validateInheritance,
+} from "./role-utils";
 
 // Permission checker utilities
 export type { UserPermissions } from "@/lib/rbac/permission-checker";
@@ -16,9 +20,9 @@ export {
   hasPermission,
   hasAnyPermission,
   hasAllPermissions,
-  hasRole,
-  hasAnyRole,
-  hasAllRoles,
+  hasRoleId,
+  hasAnyRoleId,
+  hasAllRoleIds,
   getEffectivePermissions,
   isAdmin,
   isSuperAdmin,

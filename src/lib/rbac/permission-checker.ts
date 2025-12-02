@@ -1,13 +1,8 @@
-import {
-  Permission,
-  Role,
-  getPermissionsForRoles,
-  rolesHavePermission,
-} from "./permissions";
+import { Permission } from "./permissions";
 
 export interface UserPermissions {
-  roles: Role[]; // Kept for backward compatibility, but now mostly unused
-  permissions: Permission[]; // Actual permissions from DB roles
+  roleIds: string[]; // User's role IDs from database
+  permissions: Permission[]; // Effective permissions (with inheritance resolved)
 }
 
 export function hasPermission(
@@ -36,25 +31,37 @@ export function hasAllPermissions(
   );
 }
 
-export function hasRole(userPermissions: UserPermissions, role: Role): boolean {
-  return userPermissions.roles.includes(role);
-}
-
-export function hasAnyRole(
+/**
+ * Check if user has a specific role by ID
+ */
+export function hasRoleId(
   userPermissions: UserPermissions,
-  roles: Role[]
+  roleId: string
 ): boolean {
-  return roles.some((role) => hasRole(userPermissions, role));
+  return userPermissions.roleIds.includes(roleId);
 }
 
-export function hasAllRoles(
+/**
+ * Check if user has any of the specified role IDs
+ */
+export function hasAnyRoleId(
   userPermissions: UserPermissions,
-  roles: Role[]
+  roleIds: string[]
 ): boolean {
-  return roles.every((role) => hasRole(userPermissions, role));
+  return roleIds.some((roleId) => hasRoleId(userPermissions, roleId));
 }
 
-/** Returns effective permissions (already calculated from DB) */
+/**
+ * Check if user has all of the specified role IDs
+ */
+export function hasAllRoleIds(
+  userPermissions: UserPermissions,
+  roleIds: string[]
+): boolean {
+  return roleIds.every((roleId) => hasRoleId(userPermissions, roleId));
+}
+
+/** Returns effective permissions (already calculated from DB with inheritance) */
 export function getEffectivePermissions(
   userPermissions: UserPermissions
 ): Permission[] {

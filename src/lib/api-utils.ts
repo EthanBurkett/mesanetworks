@@ -5,10 +5,9 @@ import { ensureDBConnection } from "./db";
 import {
   Permission,
   Role,
-  hasRole,
   hasPermission,
   hasAllPermissions,
-  getEffectivePermissions,
+  getUserPermissions,
 } from "./rbac";
 import { SessionQueries, SessionMutations } from "./db/models/Session.model";
 import { UserModel, UserQueries, User } from "./db/models/User.model";
@@ -173,24 +172,15 @@ async function getUserFromRequest(
       return null;
     }
 
-    // Get permissions from role documents
-    let rolePermissions: Permission[] = [];
-    if (user.roles && user.roles.length > 0) {
-      rolePermissions = await RoleQueries.getPermissionsForRoles(
-        user.roles as unknown as string[]
-      );
-    }
-
-    // Calculate effective permissions
-    const userPerms = {
-      roles: [],
-      permissions: rolePermissions,
-    };
-
-    const effectivePermissions = getEffectivePermissions(userPerms);
+    // Get permissions from role documents (with inheritance resolved)
+    // Extract role IDs from populated role objects
+    const roleIds = (user.roles || []).map((role: any) =>
+      typeof role === "string" ? role : role._id.toString()
+    );
+    const effectivePermissions = await getUserPermissions(roleIds);
 
     const permissions: UserPermissions = {
-      roles: [],
+      roleIds,
       permissions: effectivePermissions,
     };
 
@@ -258,16 +248,9 @@ export async function wrapper<T = unknown, TSchema extends z.ZodTypeAny = any>(
     }
 
     // Check if authentication is required
-    if (requireAuth || requireRole || requirePermission || requirePermissions) {
+    if (requireAuth || requirePermission || requirePermissions) {
       if (!authenticatedUser) {
         throw new UnauthorizedError("Authentication required");
-      }
-
-      // Check role requirement
-      if (requireRole && !hasRole(authenticatedUser.permissions, requireRole)) {
-        throw new ForbiddenError(
-          `This action requires the ${requireRole} role`
-        );
       }
 
       // Check single permission requirement

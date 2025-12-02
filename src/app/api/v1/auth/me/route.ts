@@ -19,20 +19,28 @@ export const GET = (request: NextRequest) =>
         throw new Errors.Unauthorized("User not authenticated");
       }
 
-      const user = await UserQueries.findByAuth0Id(identifier);
+      // Get fresh user data with populated roles
+      const user = await UserQueries.findByIdentifier(identifier);
       if (!user) {
-        return auth.user;
+        throw new Errors.NotFound("User not found");
       }
 
+      // Return user data with computed permissions from auth (already includes inheritance)
       return {
-        sub: user.auth0Id,
+        _id: user._id,
+        auth0Id: user.auth0Id,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
         avatarUrl: user.avatarUrl,
-        roles: auth.permissions.roles || [],
-        permissions: auth.permissions.permissions || [],
+        isActive: user.isActive,
+        lastLoginAt: user.lastLoginAt,
         createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        roles: user.roles || [],
+        // Computed permissions and roleIds from auth (includes inheritance)
+        permissions: auth.permissions.permissions || [],
+        roleIds: auth.permissions.roleIds || [],
       };
     }
   );

@@ -6,6 +6,8 @@ import type { UserResponse } from "@/lib/api/auth";
 
 interface AuthContextType {
   user: UserResponse | undefined;
+  permissions: string[];
+  roleIds: string[];
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -17,6 +19,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value: AuthContextType = {
     user,
+    permissions: user?.permissions || [],
+    roleIds: user?.roleIds || [],
     isLoading,
     isAuthenticated: !!user,
   };

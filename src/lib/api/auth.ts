@@ -6,6 +6,7 @@ import {
   ResetPasswordSchema,
 } from "@/schemas/auth.schema";
 import { ApiResponse } from "../api-utils";
+import { Permission } from "../rbac";
 
 const API_BASE = "/api/v1/auth";
 
@@ -30,14 +31,35 @@ export interface RegisterResponse {
   };
 }
 
+export interface RoleResponse {
+  _id: string;
+  name: string;
+  description: string;
+  permissions: string[];
+  hierarchyLevel: number;
+  inherits: boolean;
+  inheritsFrom: string[];
+  isActive: boolean;
+  isSystem: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface UserResponse {
-  id: string;
+  _id: string;
+  auth0Id: string;
   email: string;
   firstName: string;
   lastName: string;
   avatarUrl?: string;
   isActive: boolean;
   lastLoginAt?: string;
+  roles: RoleResponse[];
+  createdAt: string;
+  updatedAt: string;
+  // Computed properties for convenience
+  permissions?: string[];
+  roleIds?: string[];
 }
 
 export interface SessionResponse {

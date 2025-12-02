@@ -5,6 +5,7 @@ export enum Permission {
   USER_UPDATE = "user:update",
   USER_DELETE = "user:delete",
   USER_LIST = "user:list",
+  USER_LIST_LIMITED = "user:list:limited",
 
   // Role Management
   ROLE_READ = "role:read",
@@ -28,55 +29,8 @@ export enum Permission {
 export enum Role {
   SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
-  MODERATOR = "MODERATOR",
   USER = "USER",
-  GUEST = "GUEST",
 }
-
-export const RolePermissions: Record<Role, Permission[]> = {
-  [Role.SUPER_ADMIN]: Object.values(Permission), // All permissions
-
-  [Role.ADMIN]: [
-    // User Management
-    Permission.USER_READ,
-    Permission.USER_CREATE,
-    Permission.USER_UPDATE,
-    Permission.USER_LIST,
-    // Role Management (limited)
-    Permission.ROLE_READ,
-    Permission.ROLE_ASSIGN,
-    // Session Management
-    Permission.SESSION_READ_OWN,
-    Permission.SESSION_READ_ANY,
-    Permission.SESSION_REVOKE_OWN,
-    Permission.SESSION_REVOKE_ANY,
-    // Admin Access
-    Permission.ADMIN_PANEL_ACCESS,
-    Permission.AUDIT_LOG_READ,
-  ],
-
-  [Role.MODERATOR]: [
-    Permission.USER_READ,
-    Permission.USER_LIST,
-    Permission.SESSION_READ_OWN,
-    Permission.SESSION_REVOKE_OWN,
-    Permission.AUDIT_LOG_READ,
-  ],
-
-  [Role.USER]: [
-    Permission.USER_READ,
-    Permission.USER_UPDATE, // Own profile
-    Permission.SESSION_READ_OWN,
-    Permission.SESSION_REVOKE_OWN,
-  ],
-
-  [Role.GUEST]: [
-    Permission.USER_READ,
-    Permission.USER_UPDATE, // Own profile
-    Permission.SESSION_READ_OWN,
-    Permission.SESSION_REVOKE_OWN,
-  ],
-};
 
 export function isPermission(value: string): value is Permission {
   return Object.values(Permission).includes(value as Permission);
@@ -86,27 +40,31 @@ export function isRole(value: string): value is Role {
   return Object.values(Role).includes(value as Role);
 }
 
-export function getPermissionsForRole(role: Role): Permission[] {
-  return RolePermissions[role] || [];
-}
-
-export function getPermissionsForRoles(roles: Role[]): Permission[] {
-  const permissions = new Set<Permission>();
-  roles.forEach((role) => {
-    getPermissionsForRole(role).forEach((permission) =>
-      permissions.add(permission)
-    );
-  });
-  return Array.from(permissions);
-}
-
-export function roleHasPermission(role: Role, permission: Permission): boolean {
-  return RolePermissions[role]?.includes(permission) || false;
-}
-
-export function rolesHavePermission(
-  roles: Role[],
-  permission: Permission
-): boolean {
-  return roles.some((role) => roleHasPermission(role, permission));
-}
+/**
+ * Default permissions for system roles
+ * Used during role initialization only
+ */
+export const SystemRolePermissions: Record<Role, Permission[]> = {
+  [Role.SUPER_ADMIN]: Object.values(Permission),
+  [Role.ADMIN]: [
+    Permission.USER_READ,
+    Permission.USER_CREATE,
+    Permission.USER_UPDATE,
+    Permission.USER_LIST,
+    Permission.ROLE_READ,
+    Permission.ROLE_ASSIGN,
+    Permission.SESSION_READ_OWN,
+    Permission.SESSION_READ_ANY,
+    Permission.SESSION_REVOKE_OWN,
+    Permission.SESSION_REVOKE_ANY,
+    Permission.ADMIN_PANEL_ACCESS,
+    Permission.AUDIT_LOG_READ,
+  ],
+  [Role.USER]: [
+    Permission.USER_READ,
+    Permission.USER_UPDATE,
+    Permission.SESSION_READ_OWN,
+    Permission.SESSION_REVOKE_OWN,
+    Permission.USER_LIST_LIMITED,
+  ],
+};
