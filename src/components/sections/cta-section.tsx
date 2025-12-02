@@ -11,16 +11,16 @@ export function CtaSection() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-3xl mx-auto text-center text-white space-y-8"
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="max-w-3xl mx-auto text-center space-y-8"
         >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
-            Ready to Upgrade Your Network Infrastructure?
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground">
+            Ready to Upgrade Your Network?
           </h2>
-          <p className="text-xl text-white/90">
+          <p className="text-xl text-muted-foreground">
             Get a free consultation and quote for your next project. Our team is
             ready to help you build a reliable, high-performance network.
           </p>
@@ -32,11 +32,7 @@ export function CtaSection() {
             >
               Schedule Consultation
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-lg border-2 border-white text-white hover:bg-white/20 bg-white/10"
-            >
+            <Button size="lg" variant="outline-white" className="text-lg">
               Call (555) 123-4567
             </Button>
           </div>

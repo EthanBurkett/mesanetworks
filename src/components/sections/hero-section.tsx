@@ -16,7 +16,7 @@ export function HeroSection() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
             className="space-y-8"
           >
             <Badge className="bg-accent/10 text-accent border-accent/20 hover:bg-accent/20">
@@ -36,13 +36,10 @@ export function HeroSection() {
               required.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-lg"
-              >
+              <Button size="lg" variant="gradient" className="text-lg">
                 Request Free Quote
               </Button>
-              <Button size="lg" variant="outline" className="text-lg border-2">
+              <Button size="lg" variant="outline-primary" className="text-lg">
                 View Our Work
               </Button>
             </div>
@@ -70,7 +67,7 @@ export function HeroSection() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.15, ease: "easeOut" }}
             className="relative"
           >
             <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 flex items-center justify-center">

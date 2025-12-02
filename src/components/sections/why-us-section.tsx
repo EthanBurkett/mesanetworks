@@ -2,27 +2,32 @@
 
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
+import { Award, PackageCheck, Zap, DollarSign } from "lucide-react";
 
 const benefits = [
   {
     title: "Certified Technicians",
     description:
       "Our team holds industry certifications and stays current with the latest technologies and best practices.",
+    icon: Award,
   },
   {
     title: "Quality Materials",
     description:
       "We use only premium cables, connectors, and equipment from trusted manufacturers.",
+    icon: PackageCheck,
   },
   {
     title: "Fast Turnaround",
     description:
       "Efficient project management ensures your network is up and running on schedule.",
+    icon: Zap,
   },
   {
     title: "Competitive Pricing",
     description:
       "Transparent quotes with no hidden fees. Great value without compromising quality.",
+    icon: DollarSign,
   },
 ];
 
@@ -82,7 +87,7 @@ export function WhyUsSection() {
                   className="flex gap-4"
                 >
                   <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                    <div className="w-6 h-6 rounded-full bg-white"></div>
+                    <benefit.icon className="w-6 h-6 text-primary-foreground" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg mb-1">

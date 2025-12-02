@@ -63,7 +63,7 @@ export function ProjectsSection() {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <Card className="overflow-hidden group hover:shadow-lg transition-all">
+              <Card className="overflow-hidden group hover:shadow-lg transition-[box-shadow] will-change-[box-shadow]">
                 <div className="aspect-[4/3] bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center border-b">
                   <div className="text-center p-6">
                     <div className="text-muted-foreground text-sm uppercase tracking-wider mb-2">

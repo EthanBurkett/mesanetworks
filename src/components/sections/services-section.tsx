@@ -9,43 +9,51 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { motion } from "motion/react";
+import {
+  Cable,
+  Wifi,
+  Camera,
+  Server,
+  Network,
+  FolderKanban,
+} from "lucide-react";
 
 const services = [
   {
     title: "Structured Cabling",
     description:
       "Cat5e, Cat6, Cat6a, and fiber optic cable installation for reliable, high-speed data transmission.",
-    icon: "Cable Network Icon",
+    icon: Cable,
   },
   {
     title: "Wireless Access Points",
     description:
       "Enterprise-grade WiFi solutions for seamless coverage across your facility.",
-    icon: "WiFi Icon",
+    icon: Wifi,
   },
   {
     title: "Security Cameras",
     description:
       "IP camera installation and network video recorder setup for comprehensive surveillance.",
-    icon: "Security Camera Icon",
+    icon: Camera,
   },
   {
     title: "Network Racks",
     description:
       "Professional rack installation and cable management for organized infrastructure.",
-    icon: "Server Rack Icon",
+    icon: Server,
   },
   {
     title: "Network Switches",
     description:
       "Managed and unmanaged switch installation and configuration for optimal network performance.",
-    icon: "Network Switch Icon",
+    icon: Network,
   },
   {
     title: "Cable Management",
     description:
       "Clean, organized cable routing and labeling for easy maintenance and troubleshooting.",
-    icon: "Cable Management Icon",
+    icon: FolderKanban,
   },
 ];
 
@@ -87,12 +95,10 @@ export function ServicesSection() {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              <Card className="group hover:shadow-lg transition-all duration-300 hover:border-primary/50 bg-card">
+              <Card className="group hover:shadow-lg transition-[box-shadow,border-color] duration-300 will-change-[box-shadow] hover:border-primary/50 bg-card">
                 <CardHeader>
-                  <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <div className="text-xs text-center text-muted-foreground">
-                      {service.icon}
-                    </div>
+                  <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform will-change-transform">
+                    <service.icon className="w-8 h-8 text-primary" />
                   </div>
                   <CardTitle className="text-xl">{service.title}</CardTitle>
                 </CardHeader>
