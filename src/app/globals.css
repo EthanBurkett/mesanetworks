@@ -1,26 +1,155 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 0.5rem;
+  /* Mesa Networks Brand Colors - Modern Tech Blue/Cyan Palette */
+  --background: oklch(0.99 0.002 247);
+  --foreground: oklch(0.15 0.02 247);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.02 247);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.02 247);
+  /* Primary: Deep Tech Blue */
+  --primary: oklch(0.45 0.18 247);
+  --primary-foreground: oklch(0.99 0 0);
+  /* Secondary: Vibrant Cyan */
+  --secondary: oklch(0.65 0.15 195);
+  --secondary-foreground: oklch(0.99 0 0);
+  --muted: oklch(0.96 0.005 247);
+  --muted-foreground: oklch(0.5 0.01 247);
+  /* Accent: Electric Cyan */
+  --accent: oklch(0.72 0.18 195);
+  --accent-foreground: oklch(0.99 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.91 0.01 247);
+  --input: oklch(0.91 0.01 247);
+  --ring: oklch(0.45 0.18 247);
+  --chart-1: oklch(0.45 0.18 247);
+  --chart-2: oklch(0.65 0.15 195);
+  --chart-3: oklch(0.72 0.18 195);
+  --chart-4: oklch(0.55 0.16 220);
+  --chart-5: oklch(0.38 0.14 260);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.45 0.18 247);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  /* Dark mode with deep blues and bright cyan accents */
+  --background: oklch(0.12 0.02 247);
+  --foreground: oklch(0.97 0.01 247);
+  --card: oklch(0.16 0.025 247);
+  --card-foreground: oklch(0.97 0.01 247);
+  --popover: oklch(0.16 0.025 247);
+  --popover-foreground: oklch(0.97 0.01 247);
+  /* Primary: Bright Cyan in dark mode */
+  --primary: oklch(0.75 0.18 195);
+  --primary-foreground: oklch(0.12 0.02 247);
+  --secondary: oklch(0.25 0.03 247);
+  --secondary-foreground: oklch(0.97 0.01 247);
+  --muted: oklch(0.22 0.025 247);
+  --muted-foreground: oklch(0.65 0.01 247);
+  --accent: oklch(0.72 0.18 195);
+  --accent-foreground: oklch(0.12 0.02 247);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.25 0.03 247);
+  --input: oklch(0.25 0.03 247);
+  --ring: oklch(0.75 0.18 195);
+  --chart-1: oklch(0.75 0.18 195);
+  --chart-2: oklch(0.65 0.15 220);
+  --chart-3: oklch(0.55 0.16 247);
+  --chart-4: oklch(0.45 0.14 260);
+  --chart-5: oklch(0.7 0.16 180);
+  --sidebar: oklch(0.16 0.025 247);
+  --sidebar-foreground: oklch(0.97 0.01 247);
+  --sidebar-primary: oklch(0.75 0.18 195);
+  --sidebar-primary-foreground: oklch(0.12 0.02 247);
+  --sidebar-accent: oklch(0.22 0.025 247);
+  --sidebar-accent-foreground: oklch(0.97 0.01 247);
+  --sidebar-border: oklch(0.25 0.03 247);
+  --sidebar-ring: oklch(0.75 0.18 195);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .bg-grid-pattern {
+    background-image: linear-gradient(
+        to right,
+        currentColor 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, currentColor 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .animate-gradient {
+    background-size: 200% auto;
+    animation: gradient 3s linear infinite;
+  }
+
+  @keyframes gradient {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
 }
