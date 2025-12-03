@@ -7,6 +7,7 @@ import {
   validatePasswordStrength,
 } from "@/utils/password-validator";
 import { NextRequest } from "next/server";
+import { AuditLogger } from "@/lib/audit-logger";
 
 export const POST = (request: NextRequest) =>
   wrapper(
@@ -34,6 +35,15 @@ export const POST = (request: NextRequest) =>
       try {
         await Auth0API.verifyPasswordResetCode(body.email, body.code);
         await Auth0API.updateUserPassword(body.email, body.newPassword);
+
+        // Get user ID for logging
+        const user = await UserQueries.findByEmail(body.email);
+
+        // Log password reset
+        await AuditLogger.logPasswordReset(
+          { email: body.email, userId: user?._id },
+          request
+        );
 
         return {
           message: "Password has been successfully reset.",

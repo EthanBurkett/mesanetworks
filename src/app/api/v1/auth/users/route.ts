@@ -16,6 +16,9 @@ export const GET = (request: NextRequest) =>
     const allUsers = await UserQueries.findAll();
 
     if (hasPermission(auth.permissions, Permission.USER_LIST)) {
+      // Populate roles for full user list
+      await Promise.all(allUsers.map((user) => user.populate("roles")));
+
       return allUsers.map((user) => {
         const object = user.toObject();
         return {

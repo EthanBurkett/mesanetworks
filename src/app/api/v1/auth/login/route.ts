@@ -10,6 +10,7 @@ import { parseUserAgent } from "@/utils/device-parser";
 import { getLocationFromIP } from "@/utils/geo-location";
 import { SessionMutations } from "@/lib/db/models/Session.model";
 import { cookies } from "next/headers";
+import { AuditLogger } from "@/lib/audit-logger";
 
 export const POST = (request: NextRequest) =>
   wrapper(
@@ -112,6 +113,9 @@ export const POST = (request: NextRequest) =>
           path: "/",
         });
 
+        // Log successful login
+        await AuditLogger.logLogin(decoded.email!, true, { request });
+
         return {
           access_token: grant.access_token,
           refresh_token: grant.refresh_token,
@@ -126,6 +130,11 @@ export const POST = (request: NextRequest) =>
           },
         };
       } catch (error: any) {
+        // Log failed login attempt
+        await AuditLogger.logLogin(body.identifier, false, {
+          request,
+          errorMessage: parseAuth0Error(error),
+        });
         throw new Errors.Unauthorized(parseAuth0Error(error));
       }
     }

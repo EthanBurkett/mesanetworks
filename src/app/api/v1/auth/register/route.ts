@@ -7,6 +7,7 @@ import { parseAuth0Error } from "@/utils/auth0-errors";
 import { checkBreachedPassword } from "@/utils/password-validator";
 import { NextRequest } from "next/server";
 import z from "zod";
+import { AuditLogger } from "@/lib/audit-logger";
 
 export const POST = (request: NextRequest) =>
   wrapper(
@@ -48,6 +49,9 @@ export const POST = (request: NextRequest) =>
         if (!user) {
           throw new Errors.InternalServer("Failed to create user");
         }
+
+        // Log user registration
+        await AuditLogger.logRegister(user.email, user._id, request);
 
         return {
           message:

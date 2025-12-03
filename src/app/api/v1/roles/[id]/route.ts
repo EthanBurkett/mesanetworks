@@ -4,6 +4,8 @@ import { Permission } from "@/lib/rbac";
 import { Params } from "@/types/request";
 import { NextRequest } from "next/server";
 import z from "zod";
+import { AuditLogger } from "@/lib/audit-logger";
+import { invalidateCache, CacheKeys } from "@/lib/cache";
 
 export const PATCH = (request: NextRequest, context: Params<"id">) =>
   wrapper(
@@ -27,6 +29,15 @@ export const PATCH = (request: NextRequest, context: Params<"id">) =>
         throw new Errors.NotFound("Role not found");
       }
 
+      // Capture before state
+      const beforeState = {
+        name: role.name,
+        description: role.description,
+        permissions: role.permissions,
+        hierarchyLevel: role.hierarchyLevel,
+        isActive: role.isActive,
+      };
+
       // Prevent updating system roles EXCEPT for hierarchyLevel
       if (role.isSystem) {
         const invalidKeys = Object.keys(body).filter(
@@ -47,6 +58,32 @@ export const PATCH = (request: NextRequest, context: Params<"id">) =>
       if (body.hierarchyLevel !== undefined)
         role.hierarchyLevel = body.hierarchyLevel;
       await role.save();
+
+      // Log role update
+      await AuditLogger.logRoleUpdate(
+        {
+          roleId: role._id,
+          roleName: role.name,
+          updatedBy: auth!,
+          changes: {
+            before: beforeState,
+            after: {
+              name: role.name,
+              description: role.description,
+              permissions: role.permissions,
+              hierarchyLevel: role.hierarchyLevel,
+              isActive: role.isActive,
+            },
+          },
+        },
+        request
+      );
+
+      // Invalidate roles cache after update
+      await invalidateCache([
+        CacheKeys.roles.detail(roleId),
+        CacheKeys.roles.list(),
+      ]);
 
       return role;
     }

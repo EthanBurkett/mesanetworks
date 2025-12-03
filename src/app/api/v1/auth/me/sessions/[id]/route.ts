@@ -4,6 +4,7 @@ import { Permission } from "@/lib/rbac";
 import { Params } from "@/types/request";
 import { isValidObjectId } from "@/utils/validation";
 import { NextRequest } from "next/server";
+import { AuditLogger } from "@/lib/audit-logger";
 
 export const DELETE = (request: NextRequest, context: Params<"id">) =>
   wrapper(
@@ -23,6 +24,12 @@ export const DELETE = (request: NextRequest, context: Params<"id">) =>
       }
 
       await SessionMutations.revokeSessionById(params!.id);
+
+      // Log session revocation
+      await AuditLogger.logSessionRevoke(
+        { sessionId: params!.id, revokedBy: auth! },
+        request
+      );
 
       return { message: "Session revoked successfully" };
     }

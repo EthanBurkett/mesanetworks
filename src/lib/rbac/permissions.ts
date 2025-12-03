@@ -24,6 +24,10 @@ export enum Permission {
   ADMIN_PANEL_ACCESS = "admin:panel:access",
   SYSTEM_SETTINGS = "system:settings",
   AUDIT_LOG_READ = "audit:log:read",
+
+  // Settings Permissions
+  SETTINGS_READ = "settings:read",
+  SETTINGS_WRITE = "settings:write",
 }
 
 export enum Role {

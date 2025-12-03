@@ -59,6 +59,7 @@ const envSchema = z.object({
   // POLAR_WEBHOOK_SECRET: z.string().min(1, "POLAR_WEBHOOK_SECRET is required"),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
   JWT_EXPIRY: z.string().default("1h"),
+  REDIS_URI: z.string().default("redis://localhost:6379"),
 });
 
 if (!isVerify) {

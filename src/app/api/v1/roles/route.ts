@@ -3,6 +3,8 @@ import { RoleQueries, RoleMutations } from "@/lib/db/models/Role.model";
 import { Permission } from "@/lib/rbac";
 import { NextRequest } from "next/server";
 import z from "zod";
+import { AuditLogger } from "@/lib/audit-logger";
+import { withCache, invalidateCache, CacheKeys } from "@/lib/cache";
 
 export const GET = (request: NextRequest) =>
   wrapper(
@@ -11,8 +13,17 @@ export const GET = (request: NextRequest) =>
       requirePermission: Permission.ROLE_READ,
     },
     async () => {
-      return (await RoleQueries.listAll()).sort(
-        (a, b) => b.hierarchyLevel - a.hierarchyLevel
+      return withCache(
+        {
+          key: CacheKeys.roles.list(),
+          ttl: 300, // 5 minutes
+        },
+        async () => {
+          return (await RoleQueries.listAll()).sort(
+            (a, b) => b.hierarchyLevel - a.hierarchyLevel
+          );
+        },
+        request
       );
     }
   );
@@ -31,8 +42,8 @@ export const POST = (request: NextRequest) =>
         inheritsFrom: z.array(z.string()).default([]),
       }),
     },
-    async ({ body }) => {
-      return await RoleMutations.createRole({
+    async ({ body, auth }) => {
+      const role = await RoleMutations.createRole({
         name: body.name as any,
         description: body.description,
         permissions: body.permissions as Permission[],
@@ -41,5 +52,17 @@ export const POST = (request: NextRequest) =>
         inheritsFrom: body.inheritsFrom,
         isSystem: false,
       });
+
+      // Invalidate roles cache after creation
+      await invalidateCache(CacheKeys.roles.all());
+
+      // Log role creation
+      await AuditLogger.logRoleCreate(
+        { roleName: body.name, createdBy: auth! },
+        role._id,
+        request
+      );
+
+      return role;
     }
   );
