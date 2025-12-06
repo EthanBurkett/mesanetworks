@@ -5,7 +5,10 @@ import { Params } from "@/types/request";
 import { NextRequest } from "next/server";
 import z from "zod";
 import { AuditLogger } from "@/lib/audit-logger";
-import { sendAccountSuspendedEmail } from "@/lib/email";
+import {
+  sendAccountSuspendedEmail,
+  sendAccountActivatedEmail,
+} from "@/lib/email";
 import { SessionMutations } from "@/lib/db/models/Session.model";
 import { env } from "@/config/env";
 
@@ -81,6 +84,24 @@ export const PATCH = (request: NextRequest, context: Params<"id">) =>
           },
           request
         );
+
+        // Get admin info for email
+        const adminUser = await UserQueries.findByIdentifier(auth!.identifier);
+        const activatedBy = adminUser?.firstName
+          ? `${adminUser.firstName} ${adminUser.lastName}`
+          : adminUser?.email || "Administrator";
+
+        // Send activation email
+        sendAccountActivatedEmail(user.email, {
+          activatedBy,
+          timestamp: new Date().toLocaleString("en-US", {
+            dateStyle: "long",
+            timeStyle: "short",
+          }),
+          loginUrl: `${env.APP_URL || "https://mesanet.works"}/login`,
+        }).catch((error) => {
+          console.error("Failed to send account activation email:", error);
+        });
       }
 
       return {

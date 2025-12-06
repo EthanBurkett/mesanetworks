@@ -21,6 +21,7 @@ export {
   sendSecurityAlertEmail,
   sendSessionExpiredEmail,
   sendAccountSuspendedEmail,
+  sendAccountActivatedEmail,
   sendRoleChangedEmail,
   sendTemplateEmail,
   type TemplateVariables,

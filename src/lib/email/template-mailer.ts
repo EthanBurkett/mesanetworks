@@ -189,6 +189,27 @@ export async function sendAccountSuspendedEmail(
 }
 
 /**
+ * Send account activated notification
+ */
+export async function sendAccountActivatedEmail(
+  to: string,
+  options: {
+    activatedBy: string;
+    timestamp: string;
+    loginUrl: string;
+  }
+) {
+  const html = await loadTemplate("account-activated");
+  const rendered = renderTemplate(html, options);
+
+  return sendEmail({
+    to,
+    subject: "Account Activated - Mesa Networks",
+    html: rendered,
+  });
+}
+
+/**
  * Send role changed notification
  */
 export async function sendRoleChangedEmail(

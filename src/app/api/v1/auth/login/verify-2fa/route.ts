@@ -46,6 +46,25 @@ export const POST = (request: NextRequest) =>
         throw new Errors.Unauthorized("Invalid pending session");
       }
 
+      // Check if user account is still active before verifying 2FA
+      const user = await UserQueries.findById(decoded.userId);
+      if (!user) {
+        throw new Errors.NotFound("User not found");
+      }
+
+      if (!user.isActive) {
+        // Clear pending session cookie
+        cookieStore.delete("pending_session");
+
+        await AuditLogger.logLogin(decoded.email, false, {
+          request,
+          errorMessage: "Account is suspended",
+        });
+        throw new Errors.Forbidden(
+          "Your account has been suspended. Please contact support for assistance."
+        );
+      }
+
       // Verify 2FA code
       let verified = false;
 

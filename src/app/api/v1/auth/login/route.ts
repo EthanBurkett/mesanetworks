@@ -79,6 +79,17 @@ export const POST = (request: NextRequest) =>
           );
         }
 
+        // Check if user account is active
+        if (!user.isActive) {
+          await AuditLogger.logLogin(decoded.email!, false, {
+            request,
+            errorMessage: "Account is suspended",
+          });
+          throw new Errors.Forbidden(
+            "Your account has been suspended. Please contact support for assistance."
+          );
+        }
+
         // Check if user has 2FA enabled
         const requires2FA = await UserQueries.hasTwoFactorEnabled(user._id);
 
