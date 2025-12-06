@@ -60,6 +60,12 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
   JWT_EXPIRY: z.string().default("1h"),
   REDIS_URI: z.string().default("redis://localhost:6379"),
+
+  // Azure Blob Storage for backups
+  AZURE_STORAGE_ACCOUNT_NAME: z.string().optional(),
+  AZURE_STORAGE_ACCOUNT_KEY: z.string().optional(),
+  AZURE_STORAGE_CONNECTION_STRING: z.string().optional(),
+  AZURE_BACKUP_CONTAINER_NAME: z.string().default("database-backups"),
 });
 
 if (!isVerify) {

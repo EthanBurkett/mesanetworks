@@ -13,6 +13,12 @@ export interface ApiSettings {
   logging: boolean;
 }
 
+export interface DatabaseSettings {
+  poolSize: number;
+  connectionTimeout: number; // in ms
+  autoIndex: boolean;
+}
+
 @model("Settings", { timestamps: true })
 export class Settings {
   _id!: string;
@@ -26,6 +32,10 @@ export class Settings {
   // API settings
   @field({ type: Object, required: true })
   api!: ApiSettings;
+
+  // Database settings
+  @field({ type: Object, required: true })
+  database!: DatabaseSettings;
 }
 
 export const SettingsModel = getModel(Settings);
@@ -47,6 +57,11 @@ export class SettingsQueries {
           rateLimit: 100,
           maxRequestSize: 10,
           logging: false,
+        },
+        database: {
+          poolSize: 10,
+          connectionTimeout: 5000,
+          autoIndex: true,
         },
       });
     }
@@ -72,6 +87,11 @@ export class SettingsMutations {
           maxRequestSize: 10,
           logging: false,
         },
+        database: {
+          poolSize: 10,
+          connectionTimeout: 5000,
+          autoIndex: true,
+        },
       });
     } else {
       settings.cache = { ...settings.cache, ...updates };
@@ -96,6 +116,11 @@ export class SettingsMutations {
           maxRequestSize: updates.maxRequestSize ?? 10,
           logging: updates.logging ?? false,
         },
+        database: {
+          poolSize: 10,
+          connectionTimeout: 5000,
+          autoIndex: true,
+        },
       });
     } else {
       settings.api = { ...settings.api, ...updates };
@@ -105,9 +130,39 @@ export class SettingsMutations {
     return settings;
   }
 
+  static async updateDatabaseSettings(updates: Partial<DatabaseSettings>) {
+    let settings = await SettingsModel.findOne().exec();
+
+    if (!settings) {
+      settings = await SettingsModel.create({
+        cache: {
+          enabled: true,
+          ttl: 300,
+          compression: true,
+        },
+        api: {
+          rateLimit: 100,
+          maxRequestSize: 10,
+          logging: false,
+        },
+        database: {
+          poolSize: updates.poolSize ?? 10,
+          connectionTimeout: updates.connectionTimeout ?? 5000,
+          autoIndex: updates.autoIndex ?? true,
+        },
+      });
+    } else {
+      settings.database = { ...settings.database, ...updates };
+      await settings.save();
+    }
+
+    return settings;
+  }
+
   static async updateSettings(
     cacheUpdates?: Partial<CacheSettings>,
-    apiUpdates?: Partial<ApiSettings>
+    apiUpdates?: Partial<ApiSettings>,
+    databaseUpdates?: Partial<DatabaseSettings>
   ) {
     let settings = await SettingsModel.findOne().exec();
 
@@ -124,6 +179,11 @@ export class SettingsMutations {
           maxRequestSize: apiUpdates?.maxRequestSize ?? 10,
           logging: apiUpdates?.logging ?? false,
         },
+        database: {
+          poolSize: databaseUpdates?.poolSize ?? 10,
+          connectionTimeout: databaseUpdates?.connectionTimeout ?? 5000,
+          autoIndex: databaseUpdates?.autoIndex ?? true,
+        },
       });
     } else {
       if (cacheUpdates) {
@@ -131,6 +191,9 @@ export class SettingsMutations {
       }
       if (apiUpdates) {
         settings.api = { ...settings.api, ...apiUpdates };
+      }
+      if (databaseUpdates) {
+        settings.database = { ...settings.database, ...databaseUpdates };
       }
       await settings.save();
     }

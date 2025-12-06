@@ -264,7 +264,33 @@ export async function connectDB(uri?: string): Promise<void> {
   }
 
   try {
-    await mongoose.connect(mongoUri);
+    // Get database settings for connection options
+    let poolSize = 10;
+    let connectionTimeout = 5000;
+    let autoIndex = true;
+
+    // Try to load settings from database if already connected
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const { SettingsQueries } = await import("./models/Settings.model");
+        const settings = await SettingsQueries.getSettings();
+        poolSize = settings.database.poolSize;
+        connectionTimeout = settings.database.connectionTimeout;
+        autoIndex = settings.database.autoIndex;
+      }
+    } catch (error) {
+      // Ignore errors when loading settings (use defaults)
+      console.log("Using default connection settings");
+    }
+
+    await mongoose.connect(mongoUri, {
+      maxPoolSize: poolSize,
+      minPoolSize: Math.max(1, Math.floor(poolSize / 2)),
+      serverSelectionTimeoutMS: connectionTimeout,
+      socketTimeoutMS: connectionTimeout * 2,
+      connectTimeoutMS: connectionTimeout,
+      autoIndex: autoIndex,
+    });
     isConnected = true;
   } catch (error) {
     console.error("❌ Failed to connect to MongoDB:", error);
@@ -275,4 +301,16 @@ export async function connectDB(uri?: string): Promise<void> {
 export function disconnectDB(): Promise<void> {
   isConnected = false;
   return mongoose.disconnect();
+}
+
+/**
+ * Reconnect to database with updated settings
+ * Use this when database settings are changed
+ */
+export async function reconnectDB(): Promise<void> {
+  console.log("Reconnecting to database with updated settings...");
+  isConnected = false;
+  await mongoose.disconnect();
+  await connectDB();
+  console.log("Database reconnected successfully");
 }
