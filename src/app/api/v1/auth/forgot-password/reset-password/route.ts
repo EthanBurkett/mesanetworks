@@ -8,6 +8,7 @@ import {
 } from "@/utils/password-validator";
 import { NextRequest } from "next/server";
 import { AuditLogger } from "@/lib/audit-logger";
+import { sendPasswordChangedEmail } from "@/lib/email";
 
 export const POST = (request: NextRequest) =>
   wrapper(
@@ -43,6 +44,11 @@ export const POST = (request: NextRequest) =>
         await AuditLogger.logPasswordReset(
           { email: body.email, userId: user?._id },
           request
+        );
+
+        // Send password changed confirmation email
+        sendPasswordChangedEmail(body.email, new Date().toLocaleString()).catch(
+          (err) => console.error("Failed to send password changed email:", err)
         );
 
         return {

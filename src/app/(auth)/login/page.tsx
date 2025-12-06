@@ -1,18 +1,25 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { useLogin } from "@/hooks";
+import { useLogin, useVerify2FA } from "@/hooks";
 import { loginSchema, LoginSchema } from "@/schemas/auth.schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { TwoFactorVerify } from "@/components/auth/two-factor-verify";
 
 export default function LoginPage() {
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [verifyError, setVerifyError] = useState<string>();
+
   const loginMutation = useLogin();
+  const verify2FAMutation = useVerify2FA();
+
   const {
     register,
     handleSubmit,
@@ -28,11 +35,58 @@ export default function LoginPage() {
 
   const onSubmit = (data: LoginSchema) => {
     loginMutation.mutate(data, {
+      onSuccess: (response) => {
+        if (response.requires2FA) {
+          setRequires2FA(true);
+        }
+      },
       onError: (error: Error) => {
         setError("identifier", { message: error.message });
       },
     });
   };
+
+  const handleVerify2FA = (code: string) => {
+    setVerifyError(undefined);
+    verify2FAMutation.mutate(
+      { token: code },
+      {
+        onError: (error: Error) => {
+          setVerifyError(error.message);
+        },
+      }
+    );
+  };
+
+  const handleUseBackupCode = (code: string) => {
+    setVerifyError(undefined);
+    verify2FAMutation.mutate(
+      { backupCode: code },
+      {
+        onError: (error: Error) => {
+          setVerifyError(error.message);
+        },
+      }
+    );
+  };
+
+  const handleBackToLogin = () => {
+    setRequires2FA(false);
+    setVerifyError(undefined);
+  };
+
+  // Show 2FA verification if required
+  if (requires2FA) {
+    return (
+      <TwoFactorVerify
+        onVerify={handleVerify2FA}
+        onUseBackupCode={handleUseBackupCode}
+        onBack={handleBackToLogin}
+        isVerifying={verify2FAMutation.isPending}
+        error={verifyError}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">

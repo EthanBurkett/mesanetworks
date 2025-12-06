@@ -24,3 +24,26 @@ export function useUpdateUserRoles() {
     },
   });
 }
+
+export function useSuspendUser() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      userId,
+      isActive,
+      reason,
+    }: {
+      userId: string;
+      isActive: boolean;
+      reason?: string;
+    }) => usersApi.suspendUser(userId, isActive, reason),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success(data.message);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update user status");
+    },
+  });
+}

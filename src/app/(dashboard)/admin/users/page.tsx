@@ -2,7 +2,7 @@
 
 import { useUsers } from "@/hooks/use-users";
 import { useRoles } from "@/hooks/use-roles";
-import { useUpdateUserRoles } from "@/hooks/use-users";
+import { useUpdateUserRoles, useSuspendUser } from "@/hooks/use-users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,21 +10,45 @@ import { DataTable, Column, useDataTable } from "@/components/data-table";
 import { StatCard } from "@/components/admin/stat-card";
 import { SearchFilterBar } from "@/components/admin/search-filter-bar";
 import { ManageRolesDialog } from "@/components/admin/manage-roles-dialog";
+import { SuspendUserDialog } from "@/components/admin/suspend-user-dialog";
 import { useState, useMemo } from "react";
-import { Users, Filter, Shield, Mail, Calendar, Loader2 } from "lucide-react";
+import {
+  Users,
+  Filter,
+  Shield,
+  Mail,
+  Calendar,
+  Loader2,
+  Ban,
+  CheckCircle,
+  MoreVertical,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { UserResponse } from "@/lib/api/users";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function UsersPage() {
   const { data: users, isLoading: usersLoading } = useUsers();
   const { data: roles } = useRoles();
   const updateUserRoles = useUpdateUserRoles();
+  const suspendUser = useSuspendUser();
 
   const [statusFilter, setStatusFilter] = useState("all");
   const [roleFilter, setRoleFilter] = useState("all");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
+  const [userToSuspend, setUserToSuspend] = useState<{
+    id: string;
+    name: string;
+    isActive: boolean;
+  } | null>(null);
 
   const filterFn = useMemo(() => {
     return (user: UserResponse): boolean => {
@@ -76,6 +100,26 @@ export default function UsersPage() {
       roles: selectedRoles,
     });
     handleCloseDialog();
+  };
+
+  const handleSuspendClick = (
+    userId: string,
+    userName: string,
+    isActive: boolean
+  ) => {
+    setUserToSuspend({ id: userId, name: userName, isActive });
+    setSuspendDialogOpen(true);
+  };
+
+  const handleConfirmSuspend = async (reason?: string) => {
+    if (!userToSuspend) return;
+    await suspendUser.mutateAsync({
+      userId: userToSuspend.id,
+      isActive: !userToSuspend.isActive,
+      reason,
+    });
+    setSuspendDialogOpen(false);
+    setUserToSuspend(null);
   };
 
   const toggleRole = (roleId: string) => {
@@ -161,17 +205,43 @@ export default function UsersPage() {
       header: "Actions",
       className: "text-right",
       render: (user) => (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleEditRoles(user._id, user.roles?.map((r) => r._id) || []);
-          }}
-        >
-          <Shield className="h-4 w-4 mr-2" />
-          Manage Roles
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditRoles(user._id, user.roles?.map((r) => r._id) || []);
+              }}
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              Manage Roles
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSuspendClick(user._id, user.displayName, user.isActive);
+              }}
+              className={user.isActive ? "text-destructive" : "text-green-600"}
+            >
+              {user.isActive ? (
+                <>
+                  <Ban className="h-4 w-4 mr-2" />
+                  Suspend Account
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Activate Account
+                </>
+              )}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     },
   ];
@@ -284,6 +354,15 @@ export default function UsersPage() {
         onToggleRole={toggleRole}
         onSave={handleSaveRoles}
         isSaving={updateUserRoles.isPending}
+      />
+
+      <SuspendUserDialog
+        open={suspendDialogOpen}
+        onOpenChange={setSuspendDialogOpen}
+        userName={userToSuspend?.name || ""}
+        isCurrentlyActive={userToSuspend?.isActive || false}
+        onConfirm={handleConfirmSuspend}
+        isSaving={suspendUser.isPending}
       />
     </div>
   );

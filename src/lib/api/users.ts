@@ -57,4 +57,26 @@ export const usersApi = {
 
     return json.data;
   },
+
+  suspendUser: async (
+    userId: string,
+    isActive: boolean,
+    reason?: string
+  ): Promise<{ user: UserResponse; message: string }> => {
+    const res = await fetch(`${API_BASE}/${userId}/suspend`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isActive, reason }),
+      credentials: "include",
+    });
+
+    const json: ApiResponse<{ user: UserResponse; message: string }> =
+      await res.json();
+
+    if (!json.success || !json.data) {
+      throw new Error(json.messages[0] || "Failed to update user status");
+    }
+
+    return json.data;
+  },
 };

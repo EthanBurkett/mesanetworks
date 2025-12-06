@@ -40,7 +40,7 @@ export function GeneralSettings() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="app-url">Application URL</Label>
-              <Input id="app-url" defaultValue="https://mesanetworks.com" />
+              <Input id="app-url" defaultValue="https://mesanet.works" />
             </div>
           </div>
           <div className="space-y-2">

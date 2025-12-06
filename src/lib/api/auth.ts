@@ -12,7 +12,8 @@ const API_BASE = "/api/v1/auth";
 
 export interface LoginResponse {
   message: string;
-  user: {
+  requires2FA?: boolean;
+  user?: {
     id: string;
     email: string;
     firstName: string;
@@ -94,6 +95,26 @@ export const authApi = {
 
     if (!json.success || !json.data) {
       throw new Error(json.messages[0] || "Login failed");
+    }
+
+    return json.data;
+  },
+
+  verify2FA: async (data: {
+    token?: string;
+    backupCode?: string;
+  }): Promise<LoginResponse> => {
+    const res = await fetch(`${API_BASE}/login/verify-2fa`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    const json: ApiResponse<LoginResponse> = await res.json();
+
+    if (!json.success || !json.data) {
+      throw new Error(json.messages[0] || "2FA verification failed");
     }
 
     return json.data;

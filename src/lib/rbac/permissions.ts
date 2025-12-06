@@ -28,6 +28,13 @@ export enum Permission {
   // Settings Permissions
   SETTINGS_READ = "settings:read",
   SETTINGS_WRITE = "settings:write",
+
+  // Email Permissions
+  EMAIL_SEND = "email:send",
+  EMAIL_TEMPLATE_READ = "email:template:read",
+  EMAIL_TEMPLATE_CREATE = "email:template:create",
+  EMAIL_TEMPLATE_UPDATE = "email:template:update",
+  EMAIL_TEMPLATE_DELETE = "email:template:delete",
 }
 
 export enum Role {
@@ -63,6 +70,11 @@ export const SystemRolePermissions: Record<Role, Permission[]> = {
     Permission.SESSION_REVOKE_ANY,
     Permission.ADMIN_PANEL_ACCESS,
     Permission.AUDIT_LOG_READ,
+    Permission.EMAIL_SEND,
+    Permission.EMAIL_TEMPLATE_READ,
+    Permission.EMAIL_TEMPLATE_CREATE,
+    Permission.EMAIL_TEMPLATE_UPDATE,
+    Permission.EMAIL_TEMPLATE_DELETE,
   ],
   [Role.USER]: [
     Permission.USER_READ,

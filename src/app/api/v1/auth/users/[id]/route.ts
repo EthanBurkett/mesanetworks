@@ -1,11 +1,12 @@
 import { Errors, wrapper } from "@/lib/api-utils";
-import { UserModel } from "@/lib/db/models/User.model";
+import { UserModel, UserQueries } from "@/lib/db/models/User.model";
 import { Permission } from "@/lib/rbac";
 import { Params } from "@/types/request";
 import { NextRequest } from "next/server";
 import z from "zod";
 import { AuditLogger } from "@/lib/audit-logger";
 import { RoleModel } from "@/lib/db/models/Role.model";
+import { sendRoleChangedEmail } from "@/lib/email";
 
 export const PATCH = (request: NextRequest, context: Params<"id">) =>
   wrapper(
@@ -72,6 +73,24 @@ export const PATCH = (request: NextRequest, context: Params<"id">) =>
           }
         }
       }
+
+      // Send role change notification email
+      const roleNames = roles.map((r) => r.name).join(", ");
+      const adminUser = await UserQueries.findByIdentifier(auth!.identifier);
+      const updatedBy = adminUser?.firstName
+        ? `${adminUser?.firstName} ${adminUser?.lastName}`
+        : adminUser?.email || "Administrator";
+
+      sendRoleChangedEmail(user.email, {
+        newRole: roleNames,
+        updatedBy,
+        timestamp: new Date().toLocaleString("en-US", {
+          dateStyle: "long",
+          timeStyle: "short",
+        }),
+      }).catch((error) => {
+        console.error("Failed to send role change email:", error);
+      });
 
       return await UserModel.findById(userId).populate("roles").exec();
     }

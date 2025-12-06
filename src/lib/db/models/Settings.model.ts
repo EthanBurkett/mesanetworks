@@ -19,6 +19,16 @@ export interface DatabaseSettings {
   autoIndex: boolean;
 }
 
+export interface EmailSettings {
+  smtpHost?: string;
+  smtpPort: number;
+  smtpSecure: boolean;
+  smtpUser?: string;
+  smtpPassword?: string;
+  fromEmail?: string;
+  fromName: string;
+}
+
 @model("Settings", { timestamps: true })
 export class Settings {
   _id!: string;
@@ -36,6 +46,10 @@ export class Settings {
   // Database settings
   @field({ type: Object, required: true })
   database!: DatabaseSettings;
+
+  // Email settings
+  @field({ type: Object, required: true })
+  email!: EmailSettings;
 }
 
 export const SettingsModel = getModel(Settings);
@@ -62,6 +76,11 @@ export class SettingsQueries {
           poolSize: 10,
           connectionTimeout: 5000,
           autoIndex: true,
+        },
+        email: {
+          smtpPort: 587,
+          smtpSecure: false,
+          fromName: "Mesa Networks",
         },
       });
     }
@@ -92,6 +111,11 @@ export class SettingsMutations {
           connectionTimeout: 5000,
           autoIndex: true,
         },
+        email: {
+          smtpPort: 587,
+          smtpSecure: false,
+          fromName: "Mesa Networks",
+        },
       });
     } else {
       settings.cache = { ...settings.cache, ...updates };
@@ -120,6 +144,11 @@ export class SettingsMutations {
           poolSize: 10,
           connectionTimeout: 5000,
           autoIndex: true,
+        },
+        email: {
+          smtpPort: 587,
+          smtpSecure: false,
+          fromName: "Mesa Networks",
         },
       });
     } else {
@@ -150,6 +179,11 @@ export class SettingsMutations {
           connectionTimeout: updates.connectionTimeout ?? 5000,
           autoIndex: updates.autoIndex ?? true,
         },
+        email: {
+          smtpPort: 587,
+          smtpSecure: false,
+          fromName: "Mesa Networks",
+        },
       });
     } else {
       settings.database = { ...settings.database, ...updates };
@@ -162,7 +196,8 @@ export class SettingsMutations {
   static async updateSettings(
     cacheUpdates?: Partial<CacheSettings>,
     apiUpdates?: Partial<ApiSettings>,
-    databaseUpdates?: Partial<DatabaseSettings>
+    databaseUpdates?: Partial<DatabaseSettings>,
+    emailUpdates?: Partial<EmailSettings>
   ) {
     let settings = await SettingsModel.findOne().exec();
 
@@ -184,6 +219,15 @@ export class SettingsMutations {
           connectionTimeout: databaseUpdates?.connectionTimeout ?? 5000,
           autoIndex: databaseUpdates?.autoIndex ?? true,
         },
+        email: {
+          smtpHost: emailUpdates?.smtpHost,
+          smtpPort: emailUpdates?.smtpPort ?? 587,
+          smtpSecure: emailUpdates?.smtpSecure ?? false,
+          smtpUser: emailUpdates?.smtpUser,
+          smtpPassword: emailUpdates?.smtpPassword,
+          fromEmail: emailUpdates?.fromEmail,
+          fromName: emailUpdates?.fromName ?? "Mesa Networks",
+        },
       });
     } else {
       if (cacheUpdates) {
@@ -195,6 +239,47 @@ export class SettingsMutations {
       if (databaseUpdates) {
         settings.database = { ...settings.database, ...databaseUpdates };
       }
+      if (emailUpdates) {
+        settings.email = { ...settings.email, ...emailUpdates };
+      }
+      await settings.save();
+    }
+
+    return settings;
+  }
+
+  static async updateEmailSettings(updates: Partial<EmailSettings>) {
+    let settings = await SettingsModel.findOne().exec();
+
+    if (!settings) {
+      settings = await SettingsModel.create({
+        cache: {
+          enabled: true,
+          ttl: 300,
+          compression: true,
+        },
+        api: {
+          rateLimit: 100,
+          maxRequestSize: 10,
+          logging: false,
+        },
+        database: {
+          poolSize: 10,
+          connectionTimeout: 5000,
+          autoIndex: true,
+        },
+        email: {
+          smtpHost: updates.smtpHost,
+          smtpPort: updates.smtpPort ?? 587,
+          smtpSecure: updates.smtpSecure ?? false,
+          smtpUser: updates.smtpUser,
+          smtpPassword: updates.smtpPassword,
+          fromEmail: updates.fromEmail,
+          fromName: updates.fromName ?? "Mesa Networks",
+        },
+      });
+    } else {
+      settings.email = { ...settings.email, ...updates };
       await settings.save();
     }
 

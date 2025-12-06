@@ -4,7 +4,14 @@ import { useAuth } from "@/hooks";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { User, Shield, Settings, ChevronRight, Loader2 } from "lucide-react";
+import {
+  User,
+  Shield,
+  Settings,
+  ChevronRight,
+  Loader2,
+  KeyRound,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -21,6 +28,12 @@ const menuItems = [
     href: "/account/security",
     icon: Shield,
     description: "Active sessions and security settings",
+  },
+  {
+    title: "Two-Factor Auth",
+    href: "/account/two-factor",
+    icon: KeyRound,
+    description: "Set up two-factor authentication",
   },
   {
     title: "Settings",

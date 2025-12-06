@@ -152,6 +152,20 @@ export class SessionMutations {
     return session;
   }
 
+  static async updateSessionActivity(sessionId: string) {
+    const session = await SessionModel.findByIdAndUpdate(
+      sessionId,
+      { lastActiveAt: new Date() },
+      { new: true }
+    ).exec();
+
+    if (!session) {
+      throw new Errors.NotFound("Session not found");
+    }
+
+    return session;
+  }
+
   static async revokeSession(sessionToken: string) {
     const session = await SessionModel.findOneAndUpdate(
       { sessionToken },

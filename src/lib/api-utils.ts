@@ -15,6 +15,7 @@ import { RoleQueries } from "./db/models/Role.model";
 import type { UserPermissions } from "./rbac";
 import jwt from "jsonwebtoken";
 import { env } from "@/config/env";
+import { verifySmtpConnection } from "./email";
 
 export interface AuthenticatedUser {
   user: User;
@@ -219,6 +220,7 @@ export async function wrapper<T = unknown, TSchema extends z.ZodTypeAny = any>(
 ): Promise<NextResponse> {
   try {
     await ensureDBConnection();
+    await verifySmtpConnection();
 
     // Normalize config to always be an object
     const config: WrapperConfig<TSchema> =

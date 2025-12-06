@@ -8,6 +8,8 @@ import { checkBreachedPassword } from "@/utils/password-validator";
 import { NextRequest } from "next/server";
 import z from "zod";
 import { AuditLogger } from "@/lib/audit-logger";
+import { sendWelcomeTemplateEmail } from "@/lib/email";
+import { env } from "@/config/env";
 
 export const POST = (request: NextRequest) =>
   wrapper(
@@ -52,6 +54,13 @@ export const POST = (request: NextRequest) =>
 
         // Log user registration
         await AuditLogger.logRegister(user.email, user._id, request);
+
+        // Send welcome email (don't await to avoid blocking response)
+        sendWelcomeTemplateEmail(
+          user.email,
+          `${user.firstName} ${user.lastName}`,
+          `${env.APP_URL || "https://mesanet.works"}/login`
+        ).catch((err) => console.error("Failed to send welcome email:", err));
 
         return {
           message:

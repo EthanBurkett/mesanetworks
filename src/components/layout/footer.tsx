@@ -40,7 +40,7 @@ export function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Contact</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>info@mesanetworks.com</li>
+              <li>info@mesanet.works</li>
               <li>(555) 123-4567</li>
               <li>Austin, Texas</li>
             </ul>

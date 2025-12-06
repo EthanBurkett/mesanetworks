@@ -29,6 +29,25 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: authApi.login,
+    onSuccess: (data) => {
+      // Don't redirect or invalidate if 2FA is required
+      if (!data.requires2FA) {
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+        router.push("/");
+      }
+    },
+  });
+}
+
+/**
+ * Hook to verify 2FA during login
+ */
+export function useVerify2FA() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: authApi.verify2FA,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       router.push("/");

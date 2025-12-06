@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Verification - Mesa Networks</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        'Helvetica Neue', Arial, sans-serif;
+      background-color: #f8fafc;
+      line-height: 1.6;
+    "
+  >
+    <table
+      role="presentation"
+      style="width: 100%; border-collapse: collapse; background-color: #f8fafc"
+    >
+      <tr>
+        <td style="padding: 40px 20px">
+          <table
+            role="presentation"
+            style="
+              max-width: 600px;
+              margin: 0 auto;
+              background-color: #ffffff;
+              border-radius: 12px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+              overflow: hidden;
+            "
+          >
+            <tr>
+              <td
+                style="
+                  background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%);
+                  padding: 40px 30px;
+                  text-align: center;
+                "
+              >
+                <h1
+                  style="
+                    margin: 0;
+                    color: #ffffff;
+                    font-size: 28px;
+                    font-weight: 700;
+                  "
+                >
+                  Verify Your Email
+                </h1>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 40px 30px">
+                <h2
+                  style="
+                    margin: 0 0 16px 0;
+                    color: #1e293b;
+                    font-size: 24px;
+                    font-weight: 600;
+                  "
+                >
+                  Hi {{name}},
+                </h2>
+                <p style="margin: 0 0 24px 0; color: #64748b; font-size: 16px">
+                  Please verify your email address to complete your Mesa
+                  Networks account setup.
+                </p>
+
+                <div style="text-align: center; margin: 32px 0">
+                  <a
+                    href="{{verifyUrl}}"
+                    style="
+                      display: inline-block;
+                      background: linear-gradient(
+                        135deg,
+                        #2563eb 0%,
+                        #06b6d4 100%
+                      );
+                      color: #ffffff;
+                      text-decoration: none;
+                      padding: 14px 32px;
+                      border-radius: 8px;
+                      font-weight: 600;
+                      font-size: 16px;
+                    "
+                    >Verify Email Address</a
+                  >
+                </div>
+
+                <p style="margin: 0 0 16px 0; color: #64748b; font-size: 14px">
+                  Or copy and paste this link into your browser:
+                </p>
+                <div
+                  style="
+                    background-color: #f1f5f9;
+                    border-radius: 6px;
+                    padding: 12px;
+                    word-break: break-all;
+                    margin: 0 0 24px 0;
+                  "
+                >
+                  <a
+                    href="{{verifyUrl}}"
+                    style="
+                      color: #2563eb;
+                      font-size: 13px;
+                      text-decoration: none;
+                    "
+                    >{{verifyUrl}}</a
+                  >
+                </div>
+
+                <p style="margin: 0; color: #64748b; font-size: 14px">
+                  This link will expire in 24 hours. If you didn't create a Mesa
+                  Networks account, you can safely ignore this email.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="
+                  background-color: #f8fafc;
+                  padding: 30px;
+                  text-align: center;
+                  border-top: 1px solid #e2e8f0;
+                "
+              >
+                <p style="margin: 0 0 8px 0; color: #94a3b8; font-size: 14px">
+                  © 2025 Mesa Networks. All rights reserved.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

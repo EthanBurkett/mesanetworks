@@ -2,6 +2,7 @@
 export {
   useUser,
   useLogin,
+  useVerify2FA,
   useRegister,
   useLogout,
   useSendVerificationCode,
@@ -37,3 +38,16 @@ export {
 
 // Auth context hook (re-exported for convenience)
 export { useAuth } from "@/contexts";
+
+// Two-Factor Authentication hooks
+export {
+  useTwoFactorStatus,
+  useSetupTwoFactor,
+  useVerifyTwoFactor,
+  useDisableTwoFactor,
+  useRegenerateBackupCodes,
+  useValidateTwoFactor,
+  type TwoFactorStatus,
+  type SetupResponse,
+  type VerifyResponse,
+} from "./use-two-factor";

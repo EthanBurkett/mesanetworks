@@ -72,6 +72,13 @@ export async function createAuditLog(
  * Helper functions for common audit log scenarios
  */
 export const AuditLogger = {
+  async log(
+    data: AuditLogData,
+    context?: { auth?: AuthenticatedUser; request?: NextRequest }
+  ) {
+    await createAuditLog(data, context);
+  },
+
   // Authentication events
   async logLogin(
     email: string,
@@ -175,6 +182,52 @@ export const AuditLogger = {
         resourceName: data.userEmail,
       },
       { auth: data.deletedBy, request }
+    );
+  },
+
+  async logUserSuspend(
+    data: {
+      userId: string;
+      userEmail: string;
+      suspendedBy: AuthenticatedUser;
+      reason?: string;
+    },
+    request?: NextRequest
+  ) {
+    await createAuditLog(
+      {
+        action: AuditAction.USER_DEACTIVATE,
+        description: `Suspended user: ${data.userEmail}${
+          data.reason ? ` - Reason: ${data.reason}` : ""
+        }`,
+        severity: AuditSeverity.WARNING,
+        resourceType: "User",
+        resourceId: data.userId,
+        resourceName: data.userEmail,
+        metadata: data.reason ? { reason: data.reason } : undefined,
+      },
+      { auth: data.suspendedBy, request }
+    );
+  },
+
+  async logUserActivate(
+    data: {
+      userId: string;
+      userEmail: string;
+      activatedBy: AuthenticatedUser;
+    },
+    request?: NextRequest
+  ) {
+    await createAuditLog(
+      {
+        action: AuditAction.USER_ACTIVATE,
+        description: `Activated user: ${data.userEmail}`,
+        severity: AuditSeverity.INFO,
+        resourceType: "User",
+        resourceId: data.userId,
+        resourceName: data.userEmail,
+      },
+      { auth: data.activatedBy, request }
     );
   },
 
