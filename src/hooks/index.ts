@@ -30,10 +30,16 @@ export {
   useHasRoleId,
   useHasAnyRoleId,
   useHasAllRoleIds,
+  useHasRoleHierarchy,
   useIsAdmin,
   useIsSuperAdmin,
   usePermissions,
   useRoleIds,
+  usePermissionChecker,
+  usePermissionGuard,
+  useAnyPermissionGuard,
+  useAllPermissionsGuard,
+  useCanManageUser,
 } from "./use-permissions";
 
 // Auth context hook (re-exported for convenience)

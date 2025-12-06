@@ -18,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { Permission } from "@/lib/rbac/permissions";
 
 const menuItems = [
   {
@@ -65,7 +66,7 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, isLoading, permissions } = useAuth();
-  const hasAdminAccess = useHasPermission("admin:panel:access");
+  const hasAdminAccess = useHasPermission(Permission.ADMIN_PANEL_ACCESS);
 
   // Handle redirects in useEffect to avoid setState during render
   useEffect(() => {
@@ -102,17 +103,17 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <header className="border-b border-border/40 bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4">
               <Link href="/" className="flex items-center gap-2">
-                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <div className="h-10 w-10 rounded-lg bg-linear-to-br from-primary to-accent flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-lg">
                     MN
                   </span>
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
                   Mesa Networks
                 </span>
               </Link>
@@ -149,7 +150,7 @@ export default function AdminLayout({
             <div className="bg-card border-2 border-border rounded-xl p-6 sticky top-24">
               <div className="mb-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-linear-to-br from-primary to-accent flex items-center justify-center">
                     <Shield className="h-6 w-6 text-primary-foreground" />
                   </div>
                   <div>
@@ -176,13 +177,13 @@ export default function AdminLayout({
                         "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all group",
                         isActive
                           ? "bg-accent/10 text-accent font-medium"
-                          : "text-muted-foreground hover:bg-accent/5 hover:text-foreground"
+                          : "text-foreground hover:bg-accent/5 hover:text-foreground"
                       )}
                     >
                       <Icon className="h-4 w-4 shrink-0" />
                       <div className="flex-1">
                         <div className="font-medium">{item.title}</div>
-                        <div className="text-xs text-muted-foreground hidden lg:block">
+                        <div className="text-xs text-foreground hidden lg:block">
                           {item.description}
                         </div>
                       </div>

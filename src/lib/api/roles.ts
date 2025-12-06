@@ -39,6 +39,22 @@ export const rolesApi = {
   },
 
   /**
+   * Get a single role by ID
+   */
+  getRole: async (roleId: string): Promise<RoleResponse> => {
+    const res = await fetch(`${API_BASE}/${roleId}`, {
+      credentials: "include",
+    });
+    const json: ApiResponse<RoleResponse> = await res.json();
+
+    if (!json.success || !json.data) {
+      throw new Error(json.messages[0] || "Failed to fetch role");
+    }
+
+    return json.data;
+  },
+
+  /**
    * Create a new role
    */
   createRole: async (data: CreateRoleRequest): Promise<RoleResponse> => {

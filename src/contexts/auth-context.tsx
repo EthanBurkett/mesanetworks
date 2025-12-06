@@ -1,13 +1,14 @@
 "use client";
 
 import React, { createContext, useContext, ReactNode } from "react";
-import { useUser } from "@/hooks";
-import type { UserResponse } from "@/lib/api/auth";
+import { useRoles, useUser } from "@/hooks";
+import type { UserResponse, RoleResponse } from "@/lib/api/auth";
 
 interface AuthContextType {
   user: UserResponse | undefined;
   permissions: string[];
   roleIds: string[];
+  roles: RoleResponse[];
   isLoading: boolean;
   isAuthenticated: boolean;
 }
@@ -16,11 +17,17 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { data: user, isLoading } = useUser();
+  const roles = useRoles();
+  const userRoles = React.useMemo(() => {
+    if (!user || !roles.data) return [];
+    return roles.data.filter((role) => user.roles.includes(role._id));
+  }, [user, roles.data]);
 
   const value: AuthContextType = {
     user,
     permissions: user?.permissions || [],
     roleIds: user?.roleIds || [],
+    roles: userRoles,
     isLoading,
     isAuthenticated: !!user,
   };

@@ -1,5 +1,10 @@
 import { RoleModel, RoleMutations, RoleQueries } from "./models/Role.model";
-import { Permission, Role, SystemRolePermissions } from "../rbac/permissions";
+import {
+  Permission,
+  Role,
+  RoleHierarchy,
+  SystemRolePermissions,
+} from "../rbac/permissions";
 
 /**
  * Initialize default system roles in the database
@@ -18,7 +23,7 @@ export async function initializeSystemRoles() {
       name: Role.SUPER_ADMIN,
       description: "Super Administrator with all permissions",
       permissions: Object.values(Permission),
-      hierarchyLevel: 4,
+      hierarchyLevel: RoleHierarchy.SUPER_ADMIN,
       isSystem: true,
     });
     console.log("✓ SUPER_ADMIN role created");
@@ -38,7 +43,7 @@ export async function initializeSystemRoles() {
       name: Role.USER,
       description: "Default user role",
       permissions: SystemRolePermissions[Role.USER],
-      hierarchyLevel: 1,
+      hierarchyLevel: RoleHierarchy.USER,
       isSystem: true,
     });
     console.log("✓ USER role created");
@@ -53,10 +58,41 @@ export async function initializeSystemRoles() {
       name: Role.ADMIN,
       description: "Administrator role",
       permissions: SystemRolePermissions[Role.ADMIN],
-      hierarchyLevel: 3,
+      hierarchyLevel: RoleHierarchy.ADMIN,
       isSystem: true,
+      inherits: true,
     });
     console.log("✓ ADMIN role created");
+  }
+
+  const employeeRole = await RoleModel.findOne({ name: Role.EMPLOYEE }).exec();
+
+  if (!employeeRole) {
+    console.log("Creating EMPLOYEE role...");
+    await RoleMutations.createRole({
+      name: Role.EMPLOYEE,
+      description: "Employee role",
+      permissions: SystemRolePermissions[Role.EMPLOYEE],
+      hierarchyLevel: RoleHierarchy.EMPLOYEE,
+      isSystem: true,
+      inherits: true,
+    });
+    console.log("✓ EMPLOYEE role created");
+  }
+
+  const managerRole = await RoleModel.findOne({ name: Role.MANAGER }).exec();
+
+  if (!managerRole) {
+    console.log("Creating MANAGER role...");
+    await RoleMutations.createRole({
+      name: Role.MANAGER,
+      description: "Manager role",
+      permissions: SystemRolePermissions[Role.MANAGER],
+      hierarchyLevel: RoleHierarchy.MANAGER,
+      isSystem: true,
+      inherits: true,
+    });
+    console.log("✓ MANAGER role created");
   }
 
   console.log("System roles initialization complete");

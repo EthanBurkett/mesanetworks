@@ -88,3 +88,21 @@ export const PATCH = (request: NextRequest, context: Params<"id">) =>
       return role;
     }
   );
+
+export const GET = (request: NextRequest, context: Params<"id">) =>
+  wrapper(
+    {
+      request,
+      params: context.params,
+    },
+    async ({ params }) => {
+      const roleId = params!.id;
+
+      const role = await RoleModel.findById(roleId).exec();
+      if (!role) {
+        throw new Errors.NotFound("Role not found");
+      }
+
+      return role;
+    }
+  );
