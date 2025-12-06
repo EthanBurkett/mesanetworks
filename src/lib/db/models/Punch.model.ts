@@ -42,6 +42,15 @@ export class Punch {
 export const PunchModel = getModel(Punch);
 
 export class PunchQueries {
+  static async findAll() {
+    return PunchModel.find()
+      .populate("userId")
+      .populate("locationId")
+      .populate("shiftId")
+      .sort({ timestamp: -1 })
+      .exec();
+  }
+
   /**
    * Find punch by ID
    */

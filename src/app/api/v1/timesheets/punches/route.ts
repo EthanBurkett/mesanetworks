@@ -1,4 +1,5 @@
 import { Errors, wrapper } from "@/lib/api-utils";
+import { PunchQueries } from "@/lib/db/models/Punch.model";
 import { hasPermission, Permission } from "@/lib/rbac";
 import { NextRequest } from "next/server";
 
@@ -15,6 +16,10 @@ export const GET = (request: NextRequest) =>
         auth.permissions,
         Permission.MANAGER_READ_TIMESHEET_ANY
       );
+
+      if (readAll) {
+        return PunchQueries.findAll();
+      }
     }
   );
 

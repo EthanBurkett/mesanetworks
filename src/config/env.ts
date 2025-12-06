@@ -65,7 +65,7 @@ const envSchema = z.object({
   // POLAR_ACCESS_TOKEN: z.string().min(1, "POLAR_ACCESS_TOKEN is required"),
   // POLAR_WEBHOOK_SECRET: z.string().min(1, "POLAR_WEBHOOK_SECRET is required"),
   JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
-  JWT_EXPIRY: z.string().default("1h"),
+  JWT_EXPIRY: z.string().default("24h"),
   REDIS_URI: z.string().default("redis://localhost:6379"),
 
   // Azure Blob Storage for backups
