@@ -14,6 +14,8 @@ import {
   Loader2,
   LayoutDashboard,
   Activity,
+  Clock,
+  DollarSign,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -41,6 +43,20 @@ const menuItems = [
     icon: Shield,
     description: "Configure role hierarchy",
     permission: "role:read",
+  },
+  {
+    title: "Timesheet Approvals",
+    href: "/admin/timesheets",
+    icon: Clock,
+    description: "Approve completed shifts",
+    permission: "manager:read:shift:any",
+  },
+  {
+    title: "Payroll Export",
+    href: "/admin/payroll",
+    icon: DollarSign,
+    description: "Export timesheet data",
+    permission: "manager:read:shift:any",
   },
   {
     title: "Activity Logs",

@@ -68,7 +68,27 @@ export class ShiftQueries {
    * Find shift by ID
    */
   static async findById(id: string) {
-    return ShiftModel.findById(id).exec();
+    return ShiftModel.findById(id)
+      .populate("locationId")
+      .populate("managerId")
+      .populate("userId")
+      .exec();
+  }
+
+  static async findByUserIdAndShiftId(userId: string, shiftId: string) {
+    return ShiftModel.findOne({ userId, _id: shiftId })
+      .populate("locationId")
+      .populate("managerId")
+      .populate("userId")
+      .exec();
+  }
+
+  static async findAll() {
+    return ShiftModel.find()
+      .populate("userId")
+      .populate("managerId")
+      .populate("locationId")
+      .exec();
   }
 
   /**
@@ -352,7 +372,10 @@ export class ShiftMutations {
 
     // Calculate total minutes worked (excluding breaks)
     const totalMs = actualEnd.getTime() - shift.actualStart.getTime();
-    const totalMinutes = Math.floor(totalMs / 60000) - breakMinutes;
+    const totalMinutes = Math.max(
+      Math.floor(totalMs / 60000) - breakMinutes,
+      0
+    );
     shift.totalMinutes = totalMinutes;
 
     // Calculate variance from scheduled time

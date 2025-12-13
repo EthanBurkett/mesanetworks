@@ -20,7 +20,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const roles = useRoles();
   const userRoles = React.useMemo(() => {
     if (!user || !roles.data) return [];
-    return roles.data.filter((role) => user.roles.includes(role._id));
+    const filtered = roles.data.filter((role) => user.roles.includes(role._id));
+    console.log("Auth Debug:", {
+      userRoleIds: user.roles,
+      allRoles: roles.data.map((r) => ({
+        id: r._id,
+        name: r.name,
+        hierarchy: r.hierarchyLevel,
+      })),
+      filteredRoles: filtered.map((r) => ({
+        id: r._id,
+        name: r.name,
+        hierarchy: r.hierarchyLevel,
+      })),
+      userPermissions: user.permissions,
+      userRoleIdsFromAPI: user.roleIds,
+    });
+    return filtered;
   }, [user, roles.data]);
 
   const value: AuthContextType = {

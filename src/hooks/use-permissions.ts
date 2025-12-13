@@ -102,13 +102,37 @@ export function useHasAllRoleIds(roleIdsToCheck: string[]): boolean {
  */
 export function useHasRoleHierarchy(requiredRole: Role): boolean {
   const { roles } = useAuth();
+
+  console.log("useHasRoleHierarchy Debug:", {
+    requiredRole,
+    rolesCount: roles.length,
+    roles: roles.map((r) => ({
+      name: r.name,
+      hierarchyLevel: r.hierarchyLevel,
+    })),
+    requiredHierarchy: RoleHierarchy[requiredRole],
+    RoleHierarchyEnum: RoleHierarchy,
+    maxHierarchy:
+      roles.length > 0
+        ? Math.max(...roles.map((role) => role.hierarchyLevel))
+        : "N/A",
+  });
+
   if (roles.length === 0) return false;
 
   const requiredHierarchy = RoleHierarchy[requiredRole];
   if (requiredHierarchy === undefined) return false;
 
   const maxHierarchy = Math.max(...roles.map((role) => role.hierarchyLevel));
-  return maxHierarchy >= requiredHierarchy;
+  const result = maxHierarchy >= requiredHierarchy;
+
+  console.log("useHasRoleHierarchy Result:", {
+    maxHierarchy,
+    requiredHierarchy,
+    result,
+  });
+
+  return result;
 }
 
 /**

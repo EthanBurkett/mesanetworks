@@ -93,6 +93,15 @@ export async function initializeSystemRoles() {
       inherits: true,
     });
     console.log("✓ MANAGER role created");
+  } else if (managerRole.hierarchyLevel !== RoleHierarchy.MANAGER) {
+    // Fix hierarchy level if it's wrong
+    console.log(
+      `Updating MANAGER role hierarchy from ${managerRole.hierarchyLevel} to ${RoleHierarchy.MANAGER}...`
+    );
+    managerRole.hierarchyLevel = RoleHierarchy.MANAGER;
+    managerRole.permissions = SystemRolePermissions[Role.MANAGER];
+    await managerRole.save();
+    console.log("✓ MANAGER role hierarchy updated");
   }
 
   console.log("System roles initialization complete");

@@ -13,11 +13,13 @@ import {
   ChevronRight,
   Loader2,
   Menu,
+  Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Role } from "@/lib/rbac/permissions";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { useState } from "react";
 
 const menuItems = [
@@ -34,6 +36,13 @@ const menuItems = [
     icon: Clock,
     description: "Track your hours",
     requiresRole: Role.EMPLOYEE,
+  },
+  {
+    title: "Schedules",
+    href: "/manager/schedules",
+    icon: Calendar,
+    description: "View and manage schedules",
+    requiresRole: Role.MANAGER,
   },
   {
     title: "Account",
@@ -54,10 +63,12 @@ function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
   const isAdmin = useIsAdmin();
   const hasEmployeeAccess = useHasRoleHierarchy(Role.EMPLOYEE);
+  const hasManagerAccess = useHasRoleHierarchy(Role.MANAGER);
 
   const allowedMenuItems = menuItems.filter((item) => {
     if (item.requiresAdmin && !isAdmin) return false;
-    if (item.requiresRole && !hasEmployeeAccess) return false;
+    if (item.requiresRole == Role.EMPLOYEE && !hasEmployeeAccess) return false;
+    if (item.requiresRole == Role.MANAGER && !hasManagerAccess) return false;
     return true;
   });
 
@@ -102,6 +113,13 @@ function Sidebar({ className }: { className?: string }) {
               </Link>
             );
           })}
+        </div>
+      </div>
+
+      {/* Theme Switcher */}
+      <div className="mt-auto px-3 py-2 border-t">
+        <div className="px-4 py-2">
+          <ThemeSwitcher />
         </div>
       </div>
     </aside>

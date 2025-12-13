@@ -71,11 +71,11 @@ export enum Role {
 }
 
 export enum RoleHierarchy {
-  SUPER_ADMIN = 5,
-  ADMIN = 4,
-  MANAGER = 3,
-  EMPLOYEE = 2,
-  USER = 1,
+  SUPER_ADMIN = 4,
+  ADMIN = 3,
+  MANAGER = 2,
+  EMPLOYEE = 1,
+  USER = 0,
 }
 
 export function isPermission(value: string): value is Permission {
