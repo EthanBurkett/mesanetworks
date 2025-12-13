@@ -5,7 +5,8 @@ import { Footer } from "@/components/layout/footer";
 import { HeroSection } from "@/components/sections/hero-section";
 import { ServicesSection } from "@/components/sections/services-section";
 import { WhyUsSection } from "@/components/sections/why-us-section";
-import { ProjectsSection } from "@/components/sections/projects-section";
+import { ProcessSection } from "@/components/sections/process-section";
+import { NetworkShowcaseSection } from "@/components/sections/network-showcase-section";
 import { CtaSection } from "@/components/sections/cta-section";
 
 export default function Home() {
@@ -15,7 +16,8 @@ export default function Home() {
       <HeroSection />
       <ServicesSection />
       <WhyUsSection />
-      <ProjectsSection />
+      <ProcessSection />
+      <NetworkShowcaseSection />
       <CtaSection />
       <Footer />
     </div>

@@ -35,12 +35,47 @@ export enum Permission {
   EMAIL_TEMPLATE_CREATE = "email:template:create",
   EMAIL_TEMPLATE_UPDATE = "email:template:update",
   EMAIL_TEMPLATE_DELETE = "email:template:delete",
+
+  EMPLOYEE_CLOCK_SHIFT_OWN = "employee:clock:shift:own",
+  EMPLOYEE_READ_SHIFT_OWN = "employee:read:shift:own",
+  EMPLOYEE_UPDATE_SHIFT_OWN = "employee:update:shift:own",
+
+  EMPLOYEE_READ_TIMESHEET_OWN = "employee:read:timesheet:own",
+
+  MANAGER_READ_SHIFT_ANY = "manager:read:shift:any",
+  MANAGER_UPDATE_SHIFT_ANY = "manager:update:shift:any",
+  MANAGER_CREATE_SHIFT_ANY = "manager:create:shift:any",
+  MANAGER_APPROVE_SHIFT_ANY = "manager:approve:shift:any",
+
+  MANAGER_READ_TIMESHEET_ANY = "manager:read:timesheet:any",
+  MANAGER_REPORT_TIMESHEET_ANY = "manager:report:timesheet:any",
+
+  ADMIN_CREATE_SHIFT_ANY = "admin:create:shift:any",
+  ADMIN_READ_SHIFT_ANY = "admin:read:shift:any",
+  ADMIN_UPDATE_SHIFT_ANY = "admin:update:shift:any",
+  ADMIN_DELETE_SHIFT_ANY = "admin:delete:shift:any",
+
+  ADMIN_READ_TIMESHEET_ANY = "admin:read:timesheet:any",
+  ADMIN_UPDATE_TIMESHEET_ANY = "admin:update:timesheet:any",
+  ADMIN_DELETE_TIMESHEET_ANY = "admin:delete:timesheet:any",
+  ADMIN_REPORT_TIMESHEET_ANY = "admin:report:timesheet:any",
+  ADMIN_EXPORT_TIMESHEET_ANY = "admin:export:timesheet:any",
 }
 
 export enum Role {
   SUPER_ADMIN = "SUPER_ADMIN",
   ADMIN = "ADMIN",
+  MANAGER = "MANAGER",
+  EMPLOYEE = "EMPLOYEE",
   USER = "USER",
+}
+
+export enum RoleHierarchy {
+  SUPER_ADMIN = 4,
+  ADMIN = 3,
+  MANAGER = 2,
+  EMPLOYEE = 1,
+  USER = 0,
 }
 
 export function isPermission(value: string): value is Permission {
@@ -75,6 +110,20 @@ export const SystemRolePermissions: Record<Role, Permission[]> = {
     Permission.EMAIL_TEMPLATE_CREATE,
     Permission.EMAIL_TEMPLATE_UPDATE,
     Permission.EMAIL_TEMPLATE_DELETE,
+  ],
+  [Role.MANAGER]: [
+    Permission.MANAGER_CREATE_SHIFT_ANY,
+    Permission.MANAGER_READ_SHIFT_ANY,
+    Permission.MANAGER_UPDATE_SHIFT_ANY,
+    Permission.MANAGER_APPROVE_SHIFT_ANY,
+    Permission.MANAGER_READ_TIMESHEET_ANY,
+    Permission.MANAGER_REPORT_TIMESHEET_ANY,
+  ],
+  [Role.EMPLOYEE]: [
+    Permission.EMPLOYEE_CLOCK_SHIFT_OWN,
+    Permission.EMPLOYEE_READ_SHIFT_OWN,
+    Permission.EMPLOYEE_UPDATE_SHIFT_OWN,
+    Permission.EMPLOYEE_READ_TIMESHEET_OWN,
   ],
   [Role.USER]: [
     Permission.USER_READ,

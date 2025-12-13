@@ -10,7 +10,6 @@ export const GET = (request: NextRequest) =>
   wrapper(
     {
       request,
-      requirePermission: Permission.ROLE_READ,
     },
     async () => {
       return withCache(

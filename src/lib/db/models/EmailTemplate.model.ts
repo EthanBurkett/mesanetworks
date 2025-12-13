@@ -6,7 +6,7 @@ export interface EmailTemplateVariables {
   [key: string]: string;
 }
 
-@model("emailTemplate", {
+@model("EmailTemplate", {
   timestamps: true,
 })
 export class EmailTemplate {

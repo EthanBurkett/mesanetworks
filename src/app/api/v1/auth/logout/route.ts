@@ -9,7 +9,7 @@ export const POST = (request: NextRequest) =>
   wrapper(request, async ({ auth }) => {
     const c = await cookies();
     const sessionToken = c.get("session")?.value;
-    console.log({ auth });
+
     if (sessionToken && auth) {
       try {
         await SessionMutations.revokeSession(sessionToken);

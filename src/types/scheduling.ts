@@ -1,0 +1,14 @@
+export enum PunchType {
+  CLOCK_IN = "CLOCK_IN",
+  CLOCK_OUT = "CLOCK_OUT",
+  BREAK_START = "BREAK_START",
+  BREAK_END = "BREAK_END",
+}
+
+export enum ShiftStatus {
+  SCHEDULED = "SCHEDULED",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  APPROVED = "APPROVED",
+}

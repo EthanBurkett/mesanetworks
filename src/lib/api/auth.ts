@@ -55,7 +55,7 @@ export interface UserResponse {
   avatarUrl?: string;
   isActive: boolean;
   lastLoginAt?: string;
-  roles: RoleResponse[];
+  roles: string[];
   createdAt: string;
   updatedAt: string;
   // Computed properties for convenience

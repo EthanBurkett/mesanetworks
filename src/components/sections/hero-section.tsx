@@ -23,43 +23,42 @@ export function HeroSection() {
               Professional Network Infrastructure
             </Badge>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight">
-              Texas&apos; Premier{" "}
+              Clean, Professional{" "}
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient">
-                Data Cabling
+                Network Installations
               </span>{" "}
-              Specialists
+              in Texas
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Expert installation of structured cabling, wireless access points,
-              security cameras, network racks, and switches. Professional
-              solutions for businesses across Texas—no licenses or permits
-              required.
+              Structured cabling, wireless access points, security cameras, and
+              network racks installed to industry standards. Local,
+              owner-operated—straight communication, no upsells, no surprises.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" variant="gradient" className="text-lg">
                 Request Free Quote
               </Button>
               <Button size="lg" variant="outline-primary" className="text-lg">
-                View Our Work
+                Our Process
               </Button>
             </div>
             <div className="flex gap-8 pt-4">
               <div>
-                <div className="text-3xl font-bold text-primary">500+</div>
+                <div className="text-3xl font-bold text-primary">TIA/EIA</div>
                 <div className="text-sm text-muted-foreground">
-                  Projects Completed
+                  Standards Compliant
                 </div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-accent">24/7</div>
+                <div className="text-3xl font-bold text-accent">Local</div>
                 <div className="text-sm text-muted-foreground">
-                  Support Available
+                  Owner-Operated
                 </div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-primary">100%</div>
+                <div className="text-3xl font-bold text-primary">Clean</div>
                 <div className="text-sm text-muted-foreground">
-                  Client Satisfaction
+                  Labeled Installs
                 </div>
               </div>
             </div>
@@ -73,13 +72,13 @@ export function HeroSection() {
             <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 flex items-center justify-center">
               <div className="text-center p-8">
                 <div className="text-muted-foreground text-sm uppercase tracking-wider mb-2">
-                  Hero Image
+                  Example Standards
                 </div>
                 <div className="text-lg font-semibold text-foreground/60">
-                  Network Technician Installing
+                  Professional Network Rack
                 </div>
-                <div className="text-lg font-semibold text-foreground/60">
-                  Data Cables in Server Rack
+                <div className="text-sm text-foreground/40 mt-2">
+                  Clean installations we deliver
                 </div>
               </div>
             </div>
