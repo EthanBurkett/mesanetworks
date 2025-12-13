@@ -208,7 +208,7 @@ export const POST = (request: NextRequest) =>
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "strict",
-          maxAge: 1000 * 60 * 60 * 24,
+          maxAge: 60 * 60 * 24, // 24 hours in seconds
           path: "/",
         });
 

@@ -13,7 +13,7 @@ import {
   decryptSecret,
 } from "@/lib/auth/two-factor";
 
-@model("user", {
+@model("User", {
   timestamps: true,
 })
 export class User {

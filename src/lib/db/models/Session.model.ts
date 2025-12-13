@@ -77,13 +77,20 @@ export class SessionQueries {
   }
 
   static async findByToken(sessionToken: string) {
-    return SessionModel.findOne({ sessionToken, isActive: true }).exec();
+    const now = new Date();
+    return SessionModel.findOne({
+      sessionToken,
+      isActive: true,
+      expiresAt: { $gt: now },
+    }).exec();
   }
 
   static async findActiveSessionsByUser(identifier: string) {
+    const now = new Date();
     return SessionModel.find({
       ...this.identifier(identifier),
       isActive: true,
+      expiresAt: { $gt: now },
     })
       .sort({ lastActiveAt: -1 })
       .exec();
@@ -94,7 +101,20 @@ export class SessionQueries {
   }
 
   static async countActiveSessions(auth0Id: string) {
-    return SessionModel.countDocuments({ auth0Id, isActive: true }).exec();
+    const now = new Date();
+    return SessionModel.countDocuments({
+      auth0Id,
+      isActive: true,
+      expiresAt: { $gt: now },
+    }).exec();
+  }
+
+  /**
+   * Check if a session is valid (active and not expired)
+   */
+  static async isSessionValid(sessionToken: string): Promise<boolean> {
+    const session = await this.findByToken(sessionToken);
+    return !!session;
   }
 }
 
@@ -139,8 +159,13 @@ export class SessionMutations {
   }
 
   static async updateLastActive(sessionToken: string) {
+    const now = new Date();
     const session = await SessionModel.findOneAndUpdate(
-      { sessionToken, isActive: true },
+      {
+        sessionToken,
+        isActive: true,
+        expiresAt: { $gt: now },
+      },
       { lastActiveAt: new Date() },
       { new: true }
     ).exec();

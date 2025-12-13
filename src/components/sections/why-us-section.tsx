@@ -2,32 +2,32 @@
 
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
-import { Award, PackageCheck, Zap, DollarSign } from "lucide-react";
+import { CheckCircle2, FileText, Wrench, Tag } from "lucide-react";
 
 const benefits = [
   {
-    title: "Certified Technicians",
+    title: "Standards-Based Cabling",
     description:
-      "Our team holds industry certifications and stays current with the latest technologies and best practices.",
-    icon: Award,
+      "We follow TIA/EIA standards for all installations, ensuring your network meets industry requirements.",
+    icon: CheckCircle2,
   },
   {
-    title: "Quality Materials",
+    title: "Clean Installs & Labeled Drops",
     description:
-      "We use only premium cables, connectors, and equipment from trusted manufacturers.",
-    icon: PackageCheck,
+      "Every cable is properly terminated, tested, and labeled. No messy wiring or unlabeled connections.",
+    icon: Tag,
   },
   {
-    title: "Fast Turnaround",
+    title: "Local, Owner-Operated",
     description:
-      "Efficient project management ensures your network is up and running on schedule.",
-    icon: Zap,
+      "Direct communication with the installer. No middlemen, no outsourcing, no surprises.",
+    icon: Wrench,
   },
   {
-    title: "Competitive Pricing",
+    title: "Designed First, Installed Second",
     description:
-      "Transparent quotes with no hidden fees. Great value without compromising quality.",
-    icon: DollarSign,
+      "We plan camera angles, cable paths, and network layouts before drilling a single hole.",
+    icon: FileText,
   },
 ];
 
@@ -40,27 +40,26 @@ export function WhyUsSection() {
             <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 flex items-center justify-center">
               <div className="text-center p-8">
                 <div className="text-muted-foreground text-sm uppercase tracking-wider mb-2">
-                  Featured Image
+                  Example of Professional Standards
                 </div>
                 <div className="text-lg font-semibold text-foreground/60">
-                  Professional Team
+                  Clean Network Rack
                 </div>
-                <div className="text-lg font-semibold text-foreground/60">
-                  Working on Network Installation
+                <div className="text-sm text-foreground/40 mt-2">
+                  Industry-standard terminations we follow
                 </div>
               </div>
             </div>
           </div>
           <div className="space-y-8">
             <div>
-              <Badge className="mb-4">Why Mesa Networks</Badge>
+              <Badge className="mb-4">Why Choose MesaNet</Badge>
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                Built on Excellence & Reliability
+                Professional Installations Done Right
               </h2>
               <p className="text-lg text-muted-foreground">
-                We combine technical expertise with exceptional customer service
-                to deliver network infrastructure solutions that power your
-                business.
+                No upsells. No contracts. Just clean, properly planned network
+                installations by someone who knows what they&apos;re doing.
               </p>
             </div>
 

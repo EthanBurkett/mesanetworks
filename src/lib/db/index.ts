@@ -2,6 +2,18 @@ import "@/config/env";
 import { connectDB } from "./odm";
 import { initializeSystemRoles } from "./init-roles";
 
+// Import all models to ensure they're registered with Mongoose
+// This must happen before any populate() calls are made
+import "./models/User.model";
+import "./models/Role.model";
+import "./models/Session.model";
+import "./models/AuditLog.model";
+import "./models/Settings.model";
+import "./models/EmailTemplate.model";
+import "./models/Location.model";
+import "./models/Shift.model";
+import "./models/Punch.model";
+
 // Global connection promise to avoid multiple connection attempts
 let connectionPromise: Promise<void> | null = null;
 let rolesInitialized = false;

@@ -12,18 +12,23 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Menu, X } from "lucide-react";
-import { useAuth } from "@/hooks";
+import { useAuth, useHasRoleHierarchy } from "@/hooks";
 import { useRouter } from "next/navigation";
+import { Role } from "@/lib/rbac/permissions";
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const hasEmployeeAccess = useHasRoleHierarchy(Role.EMPLOYEE);
+  const hasAdminAccess = useHasRoleHierarchy(Role.ADMIN);
 
   const navItems = [
     { href: "#services", label: "Services" },
     { href: "#why-us", label: "Why Us" },
     { href: "#projects", label: "Projects" },
+    { href: "/admin", label: "Admin", requires: Role.ADMIN },
+    { href: "/dashboard", label: "Dashboard", requires: Role.EMPLOYEE },
   ];
 
   const handleNavClick = (href: string) => {
@@ -52,16 +57,28 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
-            {navItems.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors relative group"
-              >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-primary to-accent transition-[width] duration-300 will-change-[width] group-hover:w-full"></span>
-              </a>
-            ))}
+            {navItems.map((item) => {
+              if (item.requires) {
+                if (item.requires === Role.ADMIN && !hasAdminAccess) {
+                  return null;
+                }
+
+                if (item.requires === Role.EMPLOYEE && !hasEmployeeAccess) {
+                  return null;
+                }
+              }
+
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors relative group"
+                >
+                  {item.label}
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-primary to-accent transition-[width] duration-300 will-change-[width] group-hover:w-full"></span>
+                </a>
+              );
+            })}
             <ThemeSwitcher />
             <UserButton />
           </nav>
@@ -102,15 +119,30 @@ export function Header() {
 
                   {/* Navigation Links */}
                   <nav className="flex flex-col gap-2">
-                    {navItems.map((item) => (
-                      <button
-                        key={item.href}
-                        onClick={() => handleNavClick(item.href)}
-                        className="text-left px-4 py-3 text-base font-medium text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
-                      >
-                        {item.label}
-                      </button>
-                    ))}
+                    {navItems.map((item) => {
+                      if (item.requires) {
+                        if (item.requires === Role.ADMIN && !hasAdminAccess) {
+                          return null;
+                        }
+
+                        if (
+                          item.requires === Role.EMPLOYEE &&
+                          !hasEmployeeAccess
+                        ) {
+                          return null;
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={item.href}
+                          onClick={() => handleNavClick(item.href)}
+                          className="text-left px-4 py-3 text-base font-medium text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
                   </nav>
 
                   {/* Auth Buttons for non-authenticated users */}
