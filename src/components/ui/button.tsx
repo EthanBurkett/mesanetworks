@@ -16,7 +16,7 @@ const buttonVariants = cva(
         outline:
           "border-2 bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 hover:border-primary/50",
         "outline-primary":
-          "border-2 hover:bg-primary hover:text-white hover:border-primary transition-colors",
+          "border-2 hover:bg-primary hover:text-foreground hover:border-primary transition-colors",
         "outline-white":
           "border-2 border-white hover:bg-white hover:text-primary bg-white/10 transition-colors",
         gradient:

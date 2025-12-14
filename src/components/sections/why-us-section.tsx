@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
 import { CheckCircle2, FileText, Wrench, Tag } from "lucide-react";
+import { NetworkRackDiagram } from "@/components/process-diagrams";
 
 const benefits = [
   {
@@ -36,21 +37,25 @@ export function WhyUsSection() {
     <section id="why-us" className="py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="relative">
-            <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="text-muted-foreground text-sm uppercase tracking-wider mb-2">
-                  Example of Professional Standards
-                </div>
-                <div className="text-lg font-semibold text-foreground/60">
-                  Clean Network Rack
-                </div>
-                <div className="text-sm text-foreground/40 mt-2">
-                  Industry-standard terminations we follow
-                </div>
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-accent/5 to-primary/5 border border-accent/20 overflow-hidden">
+              <NetworkRackDiagram />
+            </div>
+            <div className="absolute bottom-4 left-4 right-4 bg-card/90 backdrop-blur-sm border rounded-lg px-4 py-2">
+              <div className="text-xs text-muted-foreground uppercase tracking-wider">
+                Example of Professional Standards
+              </div>
+              <div className="text-sm font-semibold text-foreground">
+                Clean Network Rack
               </div>
             </div>
-          </div>
+          </motion.div>
           <div className="space-y-8">
             <div>
               <Badge className="mb-4">Why Choose MesaNet</Badge>

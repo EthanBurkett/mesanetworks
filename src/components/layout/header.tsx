@@ -24,20 +24,28 @@ export function Header() {
   const hasAdminAccess = useHasRoleHierarchy(Role.ADMIN);
 
   const navItems = [
-    { href: "#services", label: "Services" },
-    { href: "#why-us", label: "Why Us" },
-    { href: "#projects", label: "Projects" },
+    { href: "/", label: "Home", isRoute: true },
+    { href: "/about", label: "About", isRoute: true },
+    { href: "/portfolio", label: "Portfolio", isRoute: true },
+    { href: "/careers", label: "Careers", isRoute: true },
+    { href: "/consultation", label: "Get Quote", isRoute: true },
     { href: "/admin", label: "Admin", requires: Role.ADMIN },
     { href: "/dashboard", label: "Dashboard", requires: Role.EMPLOYEE },
   ];
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, isRoute?: boolean) => {
     setOpen(false);
-    // Small delay to allow sheet to close before scrolling
-    setTimeout(() => {
-      const element = document.querySelector(href);
-      element?.scrollIntoView({ behavior: "smooth" });
-    }, 300);
+
+    if (isRoute) {
+      // Navigate to a new route
+      router.push(href);
+    } else {
+      // Scroll to an element on the current page
+      setTimeout(() => {
+        const element = document.querySelector(href);
+        element?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    }
   };
 
   return (
@@ -136,7 +144,9 @@ export function Header() {
                       return (
                         <button
                           key={item.href}
-                          onClick={() => handleNavClick(item.href)}
+                          onClick={() =>
+                            handleNavClick(item.href, item.isRoute)
+                          }
                           className="text-left px-4 py-3 text-base font-medium text-foreground/80 hover:text-foreground hover:bg-accent/10 rounded-lg transition-colors"
                         >
                           {item.label}
