@@ -3,6 +3,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "motion/react";
+import { NetworkDiagramPreview } from "@/components/network-diagram-preview";
+import Link from "next/link";
 
 export function HeroSection() {
   return (
@@ -35,11 +37,16 @@ export function HeroSection() {
               owner-operated—straight communication, no upsells, no surprises.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" variant="gradient" className="text-lg">
-                Request Free Quote
+              <Button size="lg" variant="gradient" className="text-lg" asChild>
+                <Link href="/consultation">Request Free Quote</Link>
               </Button>
-              <Button size="lg" variant="outline-primary" className="text-lg">
-                Our Process
+              <Button
+                size="lg"
+                variant="outline-primary"
+                className="text-lg"
+                asChild
+              >
+                <a href="#services">Our Process</a>
               </Button>
             </div>
             <div className="flex gap-8 pt-4">
@@ -69,16 +76,14 @@ export function HeroSection() {
             transition={{ duration: 0.4, delay: 0.15, ease: "easeOut" }}
             className="relative"
           >
-            <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 flex items-center justify-center">
-              <div className="text-center p-8">
-                <div className="text-muted-foreground text-sm uppercase tracking-wider mb-2">
-                  Example Standards
+            <div className="aspect-square rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/20 overflow-hidden relative">
+              <NetworkDiagramPreview />
+              <div className="absolute bottom-4 right-4 bg-card/90 backdrop-blur-sm border rounded-lg px-3 py-2 text-xs">
+                <div className="text-muted-foreground">
+                  Example Network Design
                 </div>
-                <div className="text-lg font-semibold text-foreground/60">
-                  Professional Network Rack
-                </div>
-                <div className="text-sm text-foreground/40 mt-2">
-                  Clean installations we deliver
+                <div className="text-foreground/80 font-medium">
+                  We Plan & Build
                 </div>
               </div>
             </div>

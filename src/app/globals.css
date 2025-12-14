@@ -6,6 +6,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-foreground-invert: var(--foreground-invert);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -28,6 +29,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
+  --color-muted-foreground-invert: var(--muted-foreground-invert);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-secondary: var(--secondary);
@@ -48,6 +50,7 @@
   /* Mesa Networks Brand Colors - Modern Tech Blue/Cyan Palette */
   --background: oklch(0.99 0.002 247);
   --foreground: oklch(0.15 0.02 247);
+  --foreground-invert: oklch(0.99 0.002 247);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0.02 247);
   --popover: oklch(1 0 0);
@@ -60,6 +63,7 @@
   --secondary-foreground: oklch(0.99 0 0);
   --muted: oklch(0.96 0.005 247);
   --muted-foreground: oklch(0.5 0.01 247);
+  --muted-foreground-invert: oklch(0.9 0.01 247);
   /* Accent: Electric Cyan */
   --accent: oklch(0.72 0.18 195);
   --accent-foreground: oklch(0.99 0 0);
@@ -86,6 +90,7 @@
   /* Dark mode with deep blues and bright cyan accents */
   --background: oklch(0.12 0.02 247);
   --foreground: oklch(0.97 0.01 247);
+  --foreground-invert: oklch(0.16 0.025 247);
   --card: oklch(0.16 0.025 247);
   --card-foreground: oklch(0.97 0.01 247);
   --popover: oklch(0.16 0.025 247);
@@ -96,7 +101,8 @@
   --secondary: oklch(0.25 0.03 247);
   --secondary-foreground: oklch(0.97 0.01 247);
   --muted: oklch(0.22 0.025 247);
-  --muted-foreground: oklch(0.65 0.01 247);
+  --muted-foreground: rgba(255, 255, 255, 0.7);
+  --muted-foreground-invert: oklch(0.5 0.01 247);
   /* Accent: Bright Cyan in dark mode */
   --accent: oklch(0.75 0.2 195);
   --accent-foreground: oklch(0.12 0.02 247);
