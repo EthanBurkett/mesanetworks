@@ -710,8 +710,8 @@ export function NetworkDesigner() {
       })),
       edges,
       metadata: {
-        nodeIdCounter,
-        edgeIdCounter,
+        nodeIdCounter: nodeIdCounter || 1,
+        edgeIdCounter: edgeIdCounter || 1,
         layoutAlgorithm,
       },
     };
