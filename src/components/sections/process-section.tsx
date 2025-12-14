@@ -3,6 +3,11 @@
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
 import { FileSearch, Map, FileText, Wrench, CheckSquare } from "lucide-react";
+import {
+  CablePathDiagram,
+  CameraLayoutDiagram,
+  NetworkRackDiagram,
+} from "@/components/process-diagrams";
 
 const steps = [
   {
@@ -93,45 +98,33 @@ export function ProcessSection() {
         </motion.div>
 
         <div className="mt-16 grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">
-                Example Planning
-              </div>
-              <div className="text-sm font-semibold text-foreground/60">
-                Network Diagram
-              </div>
-              <div className="text-xs text-foreground/40 mt-1">
-                Typical topology we create
-              </div>
-            </div>
-          </div>
-          <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">
-                Example Planning
-              </div>
-              <div className="text-sm font-semibold text-foreground/60">
-                Camera Angle Layout
-              </div>
-              <div className="text-xs text-foreground/40 mt-1">
-                Field of view mapping
-              </div>
-            </div>
-          </div>
-          <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 flex items-center justify-center p-4">
-            <div className="text-center">
-              <div className="text-muted-foreground text-xs uppercase tracking-wider mb-1">
-                Example Standards
-              </div>
-              <div className="text-sm font-semibold text-foreground/60">
-                Professional Tools
-              </div>
-              <div className="text-xs text-foreground/40 mt-1">
-                Proper testing equipment
-              </div>
-            </div>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="aspect-[4/3] rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 overflow-hidden"
+          >
+            <CablePathDiagram />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="aspect-[4/3] rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 overflow-hidden"
+          >
+            <CameraLayoutDiagram />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6 }}
+            className="aspect-[4/3] rounded-xl bg-gradient-to-br from-accent/10 to-primary/10 border-2 border-accent/20 overflow-hidden"
+          >
+            <NetworkRackDiagram />
+          </motion.div>
         </div>
       </div>
     </section>
