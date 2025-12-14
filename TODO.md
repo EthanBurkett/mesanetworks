@@ -77,13 +77,22 @@
 
 ## Phase 6: Advanced Features
 
-- [ ] Network validation/health check:
-  - [ ] Detect orphaned devices
-  - [ ] Identify missing default gateway
-  - [ ] Check IP address conflicts
-  - [ ] Validate VLAN consistency
-  - [ ] Bandwidth bottleneck detection
-- [ ] Device templates library
+- [x] Network validation/health check:
+  - [x] Detect orphaned devices
+  - [x] Identify missing default gateway
+  - [x] Check IP address conflicts
+  - [x] Validate VLAN consistency
+  - [x] Bandwidth bottleneck detection
+  - [x] PoE budget validation
+  - [x] Rack space allocation checks
+  - [x] Connection type compatibility
+  - [x] Redundancy analysis
+  - [x] Port capacity validation
+  - [x] Subnet and IP address validation
+  - [x] DNS/DHCP server detection
+  - [x] Inter-VLAN routing validation
+  - [x] Network security layers
+- [x] Device templates library
 - [ ] Connection templates (common patterns)
 - [ ] Copy/paste nodes and edges
 - [ ] Bulk operations (edit multiple devices)
@@ -102,13 +111,13 @@
 
 ## Phase 8: Visual Enhancements
 
-- [ ] Custom node colors/themes
-- [ ] Device icons customization
-- [ ] Connection animation controls
-- [ ] Dark/light mode optimization
-- [ ] Minimap improvements
-- [ ] Background pattern options
-- [ ] Legend/key for connection types
+- [x] Custom node colors/themes
+- [x] Device icons customization
+- [x] Connection animation controls
+- [x] Dark/light mode optimization
+- [x] Minimap improvements
+- [x] Background pattern options
+- [x] Legend/key for connection types
 - [ ] Status indicators (live monitoring simulation)
 
 ## Phase 9: Integration & Export

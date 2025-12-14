@@ -1,12 +1,29 @@
 /* React Flow Dark Theme Overrides */
 
 /* Dark mode styling for React Flow */
+.react-flow__renderer {
+  background-color: var(--background);
+}
+
+.react-flow__background {
+  background-color: var(--background);
+}
+
 .dark .react-flow__renderer {
-  background-color: hsl(var(--background));
+  background-color: var(--background);
 }
 
 .dark .react-flow__background {
-  background-color: hsl(var(--background));
+  background-color: var(--background);
+}
+
+/* Background pattern visibility */
+.react-flow__background-pattern {
+  stroke: var(--foreground);
+}
+
+.dark .react-flow__background-pattern {
+  stroke: var(--foreground);
 }
 
 /* Edge styling - ensure edges are visible and easily selectable */
@@ -17,7 +34,7 @@
 }
 
 .dark .react-flow__edge-path {
-  stroke: hsl(var(--foreground) / 0.5);
+  stroke: var(--foreground) / 0.5;
   stroke-width: 3px;
 }
 
@@ -59,19 +76,19 @@
 }
 
 .react-flow__edge-text {
-  fill: hsl(var(--foreground));
+  fill: var(--foreground);
 }
 
 .dark .react-flow__edge-text {
-  fill: hsl(var(--foreground));
+  fill: var(--foreground);
 }
 
 .react-flow__edge-textbg {
-  fill: hsl(var(--background));
+  fill: var(--background);
 }
 
 .dark .react-flow__edge-textbg {
-  fill: hsl(var(--background));
+  fill: var(--background);
 }
 
 /* Markers */
@@ -85,29 +102,29 @@
 
 /* Controls styling */
 .dark .react-flow__controls {
-  background-color: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
+  background-color: var(--card);
+  border: 1px solid var(--border);
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
 }
 
 .dark .react-flow__controls-button {
-  background-color: hsl(var(--card));
-  border-bottom: 1px solid hsl(var(--border));
-  color: hsl(var(--foreground));
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
+  color: var(--foreground);
 }
 
 .dark .react-flow__controls-button:hover {
-  background-color: hsl(var(--accent));
+  background-color: var(--accent);
 }
 
 .dark .react-flow__controls-button svg {
-  fill: hsl(var(--foreground));
+  fill: var(--foreground);
 }
 
 /* Minimap styling */
 .dark .react-flow__minimap {
-  background-color: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
+  background-color: var(--card);
+  border: 1px solid var(--border);
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
 }
 
@@ -117,52 +134,52 @@
 
 /* Attribution */
 .dark .react-flow__attribution {
-  background-color: hsl(var(--card) / 0.8);
-  color: hsl(var(--muted-foreground));
-  border: 1px solid hsl(var(--border));
+  background-color: var(--card) / 0.8;
+  color: var(--muted-foreground);
+  border: 1px solid var(--border);
 }
 
 /* Panel styling */
 .dark .react-flow__panel {
-  color: hsl(var(--foreground));
+  color: var(--foreground);
 }
 
 /* Selection box */
 .dark .react-flow__selection {
-  background-color: hsl(var(--primary) / 0.1);
-  border: 1px solid hsl(var(--primary));
+  background-color: var(--primary) / 0.1;
+  border: 1px solid var(--primary);
 }
 
 /* Node selection */
 .dark .react-flow__node.selected {
-  box-shadow: 0 0 0 2px hsl(var(--primary));
+  box-shadow: 0 0 0 2px var(--primary);
 }
 
 /* Edge selection */
 .dark .react-flow__edge.selected .react-flow__edge-path {
-  stroke: hsl(var(--primary));
+  stroke: var(--primary);
   stroke-width: 2.5px;
 }
 
 /* Handle styling */
 .dark .react-flow__handle {
-  background-color: hsl(var(--primary));
-  border: 2px solid hsl(var(--background));
+  background-color: var(--primary);
+  border: 2px solid var(--background);
 }
 
 .dark .react-flow__handle:hover {
-  background-color: hsl(var(--primary) / 0.8);
+  background-color: var(--primary) / 0.8;
 }
 
 /* Connection line */
 .dark .react-flow__connectionline {
-  stroke: hsl(var(--primary));
+  stroke: var(--primary);
 }
 
 /* Nodes drag */
 .dark .react-flow__nodesselection-rect {
-  background-color: hsl(var(--primary) / 0.1);
-  border: 1px solid hsl(var(--primary));
+  background-color: var(--primary) / 0.1;
+  border: 1px solid var(--primary);
 }
 
 /* Ensure panels don't interfere with nodes */
@@ -190,4 +207,41 @@
 
 .react-flow__panel.react-flow__panel-right {
   right: 10px;
+}
+
+/* Connection Animation Styles */
+@keyframes flow-animation {
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pulse-animation {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.7;
+    filter: brightness(1.3);
+  }
+}
+
+/* Animated edges */
+.react-flow__edge-path[data-animated="true"] {
+  stroke-dasharray: 8, 4;
+  animation: flow-animation 2s linear infinite;
+}
+
+.react-flow__edge-path[data-animation-type="pulse"] {
+  animation: pulse-animation 2s ease-in-out infinite;
+}
+
+.react-flow__edge-path[data-animation-type="dash"] {
+  stroke-dasharray: 5, 5;
+  animation: flow-animation 2s linear infinite;
 }

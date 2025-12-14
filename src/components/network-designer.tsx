@@ -43,6 +43,10 @@ import {
   Database,
   Layers,
   Network,
+  CheckCircle2,
+  Library,
+  Palette,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,9 +77,17 @@ import {
   LoadNetworkDialog,
   ShareNetworkDialog,
   ColorPicker,
+  ValidationPanel,
+  DeviceTemplatesDialog,
+  VisualSettingsPanel,
+  ConnectionLegend,
 } from "./network-designer/";
+import type { VisualSettings } from "./network-designer/";
 import { NETWORK_TEMPLATES } from "./network-designer/constants";
+import { validateNetwork, ValidationResult } from "@/lib/network-validator";
+import { DeviceTemplate } from "@/lib/device-templates";
 import { Label } from "./ui/label";
+import { defaultVisualSettings } from "./network-designer/VisualSettingsPanel";
 
 type DeviceType =
   | "router"
@@ -124,6 +136,15 @@ export function NetworkDesigner() {
   const [networkDescription, setNetworkDescription] = useState("");
   const [currentNetworkId, setCurrentNetworkId] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [validationPanelOpen, setValidationPanelOpen] = useState(false);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
+  const [deviceTemplatesDialogOpen, setDeviceTemplatesDialogOpen] =
+    useState(false);
+  const [visualSettingsPanelOpen, setVisualSettingsPanelOpen] = useState(false);
+  const [visualSettings, setVisualSettings] = useState<VisualSettings>(
+    defaultVisualSettings
+  );
 
   // Undo/Redo state
   const [history, setHistory] = useState<
@@ -195,6 +216,59 @@ export function NetworkDesigner() {
       localStorage.setItem("network-designer-data", JSON.stringify(data));
     }
   }, [nodes, edges, nodeIdCounter, edgeIdCounter]);
+
+  // Update edge animations when visual settings change
+  useEffect(() => {
+    setEdges((eds) =>
+      eds.map((edge) => ({
+        ...edge,
+        animated: visualSettings.connectionAnimation,
+        style: {
+          ...edge.style,
+          strokeDasharray:
+            visualSettings.connectionAnimation &&
+            visualSettings.animationType === "dash"
+              ? "5,5"
+              : undefined,
+          animationDuration: visualSettings.connectionAnimation
+            ? `${2 / visualSettings.animationSpeed}s`
+            : undefined,
+        },
+      }))
+    );
+  }, [
+    visualSettings.connectionAnimation,
+    visualSettings.animationType,
+    visualSettings.animationSpeed,
+    setEdges,
+  ]);
+
+  // Apply custom node colors when color scheme changes
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.type === "custom" && node.data.type) {
+          const deviceType = node.data
+            .type as keyof typeof visualSettings.customNodeColors;
+          const color =
+            visualSettings.customNodeColors[deviceType] ||
+            visualSettings.customNodeColors.client;
+          return {
+            ...node,
+            style: {
+              ...node.style,
+              borderColor: color,
+            },
+          };
+        }
+        return node;
+      })
+    );
+  }, [
+    visualSettings.customNodeColors,
+    visualSettings.nodeColorScheme,
+    setNodes,
+  ]);
 
   // Update selected node when selection changes
   useEffect(() => {
@@ -629,6 +703,48 @@ export function NetworkDesigner() {
 
       setNodes((nds) => nds.concat(newNode));
       setNodeIdCounter((id) => id + 1);
+    },
+    [reactFlowInstance, nodeIdCounter, setNodes]
+  );
+
+  // Handle device template selection
+  const handleTemplateSelection = useCallback(
+    (template: DeviceTemplate) => {
+      if (!reactFlowInstance) {
+        toast.error("Canvas not ready");
+        return;
+      }
+
+      // Get the center of the viewport
+      const { x, y, zoom } = reactFlowInstance.getViewport();
+      const centerX = -x / zoom + window.innerWidth / (2 * zoom);
+      const centerY = -y / zoom + window.innerHeight / (2 * zoom);
+
+      const newNode: Node = {
+        id: `device-${nodeIdCounter}`,
+        type: "custom",
+        position: { x: centerX - 100, y: centerY - 75 },
+        data: {
+          label: template.name,
+          type: template.category,
+          status: "online",
+          ip: "",
+          location: "",
+          vlan: template.defaultVLAN?.toString() || "",
+          portCount: template.portCount,
+          bandwidth: template.bandwidth,
+          powerConsumption: template.powerConsumption,
+          rackUnits: template.rackUnits,
+          metadata: {
+            vendor: template.vendor,
+            ...template.metadata,
+          },
+        },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+      setNodeIdCounter((id) => id + 1);
+      toast.success(`Added ${template.name} to canvas`);
     },
     [reactFlowInstance, nodeIdCounter, setNodes]
   );
@@ -1170,6 +1286,100 @@ export function NetworkDesigner() {
     [nodes.length, edges.length, setNodes, setEdges]
   );
 
+  // Run network validation
+  const runValidation = useCallback(() => {
+    const result = validateNetwork(nodes, edges);
+    setValidationResult(result);
+    setValidationPanelOpen(true);
+
+    // Clear any previous highlighting when validation is re-run
+    setNodes((nds) =>
+      nds.map((node) => ({
+        ...node,
+        selected: false,
+        style: {
+          ...node.style,
+          border: undefined,
+        },
+      }))
+    );
+    setEdges((eds) =>
+      eds.map((edge) => ({
+        ...edge,
+        selected: false,
+        style: {
+          ...edge.style,
+          stroke: edge.data?.connectionType
+            ? getConnectionTypeColor(edge.data.connectionType)
+            : edge.style?.stroke,
+          strokeWidth: edge.data?.connectionType === "fiber" ? 3.5 : 2.5,
+        },
+      }))
+    );
+
+    if (result.isValid) {
+      toast.success("Network validation passed!");
+    } else {
+      toast.warning(
+        `Found ${result.summary.errors} errors and ${result.summary.warnings} warnings`
+      );
+    }
+  }, [nodes, edges, setNodes, setEdges]);
+
+  // Helper function to get connection type color
+  const getConnectionTypeColor = (connectionType: string): string => {
+    const colors: Record<string, string> = {
+      ethernet: "#3b82f6",
+      fiber: "#ef4444",
+      wireless: "#06b6d4",
+      wan: "#8b5cf6",
+    };
+    return colors[connectionType] || "#3b82f6";
+  };
+
+  // Highlight nodes from validation
+  const highlightNodes = useCallback(
+    (nodeIds: string[]) => {
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: nodeIds.includes(node.id),
+          style: {
+            ...node.style,
+            border: nodeIds.includes(node.id) ? "2px solid #ef4444" : undefined,
+          },
+        }))
+      );
+    },
+    [setNodes]
+  );
+
+  // Highlight edges from validation
+  const highlightEdges = useCallback(
+    (edgeIds: string[]) => {
+      setEdges((eds) =>
+        eds.map((edge) => ({
+          ...edge,
+          selected: edgeIds.includes(edge.id),
+          style: {
+            ...edge.style,
+            stroke: edgeIds.includes(edge.id)
+              ? "#ef4444"
+              : edge.data?.connectionType
+              ? getConnectionTypeColor(edge.data.connectionType)
+              : edge.style?.stroke,
+            strokeWidth: edgeIds.includes(edge.id)
+              ? 4
+              : edge.data?.connectionType === "fiber"
+              ? 3.5
+              : 2.5,
+          },
+        }))
+      );
+    },
+    [setEdges]
+  );
+
   return (
     <div className="flex h-full">
       {/* Device Palette Sidebar */}
@@ -1196,6 +1406,7 @@ export function NetworkDesigner() {
           attributionPosition="bottom-left"
           defaultEdgeOptions={{
             style: { strokeWidth: 2.5 },
+            animated: visualSettings.connectionAnimation,
             labelStyle: {
               fontSize: 12,
               fontWeight: 600,
@@ -1215,9 +1426,39 @@ export function NetworkDesigner() {
           snapToGrid={gridSnap}
           snapGrid={[15, 15]}
         >
-          <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
+          <Background
+            variant={visualSettings.backgroundPattern}
+            gap={visualSettings.backgroundGap}
+            size={visualSettings.backgroundSize}
+            style={{
+              opacity: visualSettings.backgroundOpacity,
+            }}
+          />
           <Controls />
-          <MiniMap nodeStrokeWidth={3} zoomable pannable />
+          {visualSettings.minimapEnabled && (
+            <MiniMap
+              nodeStrokeWidth={3}
+              zoomable
+              pannable
+              position={visualSettings.minimapPosition}
+              style={{
+                transform: `scale(${visualSettings.minimapSize})`,
+                transformOrigin:
+                  visualSettings.minimapPosition === "top-left"
+                    ? "top left"
+                    : visualSettings.minimapPosition === "top-right"
+                    ? "top right"
+                    : visualSettings.minimapPosition === "bottom-left"
+                    ? "bottom left"
+                    : "bottom right",
+              }}
+            />
+          )}
+
+          {/* Connection Legend */}
+          {visualSettings.showLegend && (
+            <ConnectionLegend position={visualSettings.legendPosition} />
+          )}
 
           {/* Toolbar Panel */}
           <Panel
@@ -1342,6 +1583,31 @@ export function NetworkDesigner() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* Device Templates Library */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => setDeviceTemplatesDialogOpen(true)}
+              >
+                <Library className="w-4 h-4" />
+                Device Library
+              </Button>
+
+              <div className="w-px h-6 bg-border mx-1" />
+
+              {/* Visual Settings */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => setVisualSettingsPanelOpen(true)}
+                title="Visual Settings"
+              >
+                <Palette className="w-4 h-4" />
+                Visuals
+              </Button>
+
               {/* Layout */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1365,6 +1631,20 @@ export function NetworkDesigner() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              <div className="w-px h-6 bg-border mx-1" />
+
+              {/* Validation */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={runValidation}
+                className="gap-2"
+                title="Validate Network"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Validate
+              </Button>
 
               <div className="w-px h-6 bg-border mx-1" />
 
@@ -1557,6 +1837,31 @@ export function NetworkDesigner() {
         onOpenChange={setShareDialogOpen}
         shareUrl={shareUrl || ""}
         onCopyLink={copyShareLink}
+      />
+
+      {/* Validation Panel */}
+      {validationPanelOpen && (
+        <ValidationPanel
+          validationResult={validationResult}
+          onClose={() => setValidationPanelOpen(false)}
+          onHighlightNodes={highlightNodes}
+          onHighlightEdges={highlightEdges}
+        />
+      )}
+
+      {/* Device Templates Dialog */}
+      <DeviceTemplatesDialog
+        open={deviceTemplatesDialogOpen}
+        onOpenChange={setDeviceTemplatesDialogOpen}
+        onSelectTemplate={handleTemplateSelection}
+      />
+
+      {/* Visual Settings Panel */}
+      <VisualSettingsPanel
+        open={visualSettingsPanelOpen}
+        onOpenChange={setVisualSettingsPanelOpen}
+        settings={visualSettings}
+        onSettingsChange={setVisualSettings}
       />
     </div>
   );
