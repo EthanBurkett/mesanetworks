@@ -10,4 +10,6 @@ export { SaveNetworkDialog } from "./SaveNetworkDialog";
 export { LoadNetworkDialog } from "./LoadNetworkDialog";
 export { ShareNetworkDialog } from "./ShareNetworkDialog";
 export { ColorPicker } from "./ColorPicker";
+export { ValidationPanel } from "./ValidationPanel";
+export { DeviceTemplatesDialog } from "./DeviceTemplatesDialog";
 export { NETWORK_TEMPLATES, PRESET_COLORS } from "./constants";

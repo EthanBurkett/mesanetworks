@@ -77,13 +77,13 @@
 
 ## Phase 6: Advanced Features
 
-- [ ] Network validation/health check:
-  - [ ] Detect orphaned devices
-  - [ ] Identify missing default gateway
-  - [ ] Check IP address conflicts
-  - [ ] Validate VLAN consistency
-  - [ ] Bandwidth bottleneck detection
-- [ ] Device templates library
+- [x] Network validation/health check:
+  - [x] Detect orphaned devices
+  - [x] Identify missing default gateway
+  - [x] Check IP address conflicts
+  - [x] Validate VLAN consistency
+  - [x] Bandwidth bottleneck detection
+- [x] Device templates library
 - [ ] Connection templates (common patterns)
 - [ ] Copy/paste nodes and edges
 - [ ] Bulk operations (edit multiple devices)

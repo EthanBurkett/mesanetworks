@@ -43,6 +43,8 @@ import {
   Database,
   Layers,
   Network,
+  CheckCircle2,
+  Library,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,8 +75,12 @@ import {
   LoadNetworkDialog,
   ShareNetworkDialog,
   ColorPicker,
+  ValidationPanel,
+  DeviceTemplatesDialog,
 } from "./network-designer/";
 import { NETWORK_TEMPLATES } from "./network-designer/constants";
+import { validateNetwork, ValidationResult } from "@/lib/network-validator";
+import { DeviceTemplate } from "@/lib/device-templates";
 import { Label } from "./ui/label";
 
 type DeviceType =
@@ -124,6 +130,11 @@ export function NetworkDesigner() {
   const [networkDescription, setNetworkDescription] = useState("");
   const [currentNetworkId, setCurrentNetworkId] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [validationPanelOpen, setValidationPanelOpen] = useState(false);
+  const [validationResult, setValidationResult] =
+    useState<ValidationResult | null>(null);
+  const [deviceTemplatesDialogOpen, setDeviceTemplatesDialogOpen] =
+    useState(false);
 
   // Undo/Redo state
   const [history, setHistory] = useState<
@@ -629,6 +640,46 @@ export function NetworkDesigner() {
 
       setNodes((nds) => nds.concat(newNode));
       setNodeIdCounter((id) => id + 1);
+    },
+    [reactFlowInstance, nodeIdCounter, setNodes]
+  );
+
+  // Handle device template selection
+  const handleTemplateSelection = useCallback(
+    (template: DeviceTemplate) => {
+      if (!reactFlowInstance) {
+        toast.error("Canvas not ready");
+        return;
+      }
+
+      // Get the center of the viewport
+      const { x, y, zoom } = reactFlowInstance.getViewport();
+      const centerX = -x / zoom + window.innerWidth / (2 * zoom);
+      const centerY = -y / zoom + window.innerHeight / (2 * zoom);
+
+      const newNode: Node = {
+        id: `device-${nodeIdCounter}`,
+        type: "custom",
+        position: { x: centerX - 100, y: centerY - 75 },
+        data: {
+          label: template.name,
+          type: template.category,
+          status: template.defaultProperties.status || "online",
+          ip: "",
+          location: "",
+          vlan: template.defaultProperties.vlan || "",
+          model: template.model,
+          portCount: template.defaultProperties.portCount,
+          metadata: {
+            vendor: template.vendor,
+            ...template.defaultProperties.metadata,
+          },
+        },
+      };
+
+      setNodes((nds) => nds.concat(newNode));
+      setNodeIdCounter((id) => id + 1);
+      toast.success(`Added ${template.name} to canvas`);
     },
     [reactFlowInstance, nodeIdCounter, setNodes]
   );
@@ -1170,6 +1221,100 @@ export function NetworkDesigner() {
     [nodes.length, edges.length, setNodes, setEdges]
   );
 
+  // Run network validation
+  const runValidation = useCallback(() => {
+    const result = validateNetwork(nodes, edges);
+    setValidationResult(result);
+    setValidationPanelOpen(true);
+
+    // Clear any previous highlighting when validation is re-run
+    setNodes((nds) =>
+      nds.map((node) => ({
+        ...node,
+        selected: false,
+        style: {
+          ...node.style,
+          border: undefined,
+        },
+      }))
+    );
+    setEdges((eds) =>
+      eds.map((edge) => ({
+        ...edge,
+        selected: false,
+        style: {
+          ...edge.style,
+          stroke: edge.data?.connectionType
+            ? getConnectionTypeColor(edge.data.connectionType)
+            : edge.style?.stroke,
+          strokeWidth: edge.data?.connectionType === "fiber" ? 3.5 : 2.5,
+        },
+      }))
+    );
+
+    if (result.isValid) {
+      toast.success("Network validation passed!");
+    } else {
+      toast.warning(
+        `Found ${result.summary.errors} errors and ${result.summary.warnings} warnings`
+      );
+    }
+  }, [nodes, edges, setNodes, setEdges]);
+
+  // Helper function to get connection type color
+  const getConnectionTypeColor = (connectionType: string): string => {
+    const colors: Record<string, string> = {
+      ethernet: "#3b82f6",
+      fiber: "#ef4444",
+      wireless: "#06b6d4",
+      wan: "#8b5cf6",
+    };
+    return colors[connectionType] || "#3b82f6";
+  };
+
+  // Highlight nodes from validation
+  const highlightNodes = useCallback(
+    (nodeIds: string[]) => {
+      setNodes((nds) =>
+        nds.map((node) => ({
+          ...node,
+          selected: nodeIds.includes(node.id),
+          style: {
+            ...node.style,
+            border: nodeIds.includes(node.id) ? "2px solid #ef4444" : undefined,
+          },
+        }))
+      );
+    },
+    [setNodes]
+  );
+
+  // Highlight edges from validation
+  const highlightEdges = useCallback(
+    (edgeIds: string[]) => {
+      setEdges((eds) =>
+        eds.map((edge) => ({
+          ...edge,
+          selected: edgeIds.includes(edge.id),
+          style: {
+            ...edge.style,
+            stroke: edgeIds.includes(edge.id)
+              ? "#ef4444"
+              : edge.data?.connectionType
+              ? getConnectionTypeColor(edge.data.connectionType)
+              : edge.style?.stroke,
+            strokeWidth: edgeIds.includes(edge.id)
+              ? 4
+              : edge.data?.connectionType === "fiber"
+              ? 3.5
+              : 2.5,
+          },
+        }))
+      );
+    },
+    [setEdges]
+  );
+
   return (
     <div className="flex h-full">
       {/* Device Palette Sidebar */}
@@ -1342,6 +1487,17 @@ export function NetworkDesigner() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* Device Templates Library */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => setDeviceTemplatesDialogOpen(true)}
+              >
+                <Library className="w-4 h-4" />
+                Device Library
+              </Button>
+
               {/* Layout */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1365,6 +1521,20 @@ export function NetworkDesigner() {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+
+              <div className="w-px h-6 bg-border mx-1" />
+
+              {/* Validation */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={runValidation}
+                className="gap-2"
+                title="Validate Network"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                Validate
+              </Button>
 
               <div className="w-px h-6 bg-border mx-1" />
 
@@ -1557,6 +1727,23 @@ export function NetworkDesigner() {
         onOpenChange={setShareDialogOpen}
         shareUrl={shareUrl || ""}
         onCopyLink={copyShareLink}
+      />
+
+      {/* Validation Panel */}
+      {validationPanelOpen && (
+        <ValidationPanel
+          validationResult={validationResult}
+          onClose={() => setValidationPanelOpen(false)}
+          onHighlightNodes={highlightNodes}
+          onHighlightEdges={highlightEdges}
+        />
+      )}
+
+      {/* Device Templates Dialog */}
+      <DeviceTemplatesDialog
+        open={deviceTemplatesDialogOpen}
+        onOpenChange={setDeviceTemplatesDialogOpen}
+        onSelectTemplate={handleTemplateSelection}
       />
     </div>
   );
