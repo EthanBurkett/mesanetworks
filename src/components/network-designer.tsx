@@ -664,15 +664,17 @@ export function NetworkDesigner() {
         data: {
           label: template.name,
           type: template.category,
-          status: template.defaultProperties.status || "online",
+          status: "online",
           ip: "",
           location: "",
-          vlan: template.defaultProperties.vlan || "",
-          model: template.model,
-          portCount: template.defaultProperties.portCount,
+          vlan: template.defaultVLAN?.toString() || "",
+          portCount: template.portCount,
+          bandwidth: template.bandwidth,
+          powerConsumption: template.powerConsumption,
+          rackUnits: template.rackUnits,
           metadata: {
             vendor: template.vendor,
-            ...template.defaultProperties.metadata,
+            ...template.metadata,
           },
         },
       };

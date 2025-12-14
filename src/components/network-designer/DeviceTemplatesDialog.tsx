@@ -23,8 +23,11 @@ import {
   DEVICE_TEMPLATES,
   getTemplatesByCategory,
   getTemplatesByVendor,
+  getTemplatesByTag,
   searchTemplates,
   getVendors,
+  getTags,
+  getTemplateCounts,
 } from "@/lib/device-templates";
 import {
   Router,
@@ -51,7 +54,7 @@ const categoryIcons = {
   firewall: Shield,
   server: Server,
   nas: HardDrive,
-  ap: Wifi,
+  "access-point": Wifi,
   camera: Camera,
   client: Monitor,
   cloud: Cloud,
@@ -63,7 +66,7 @@ const categoryLabels = {
   firewall: "Firewalls",
   server: "Servers",
   nas: "NAS/Storage",
-  ap: "Access Points",
+  "access-point": "Access Points",
   camera: "Cameras",
   client: "Clients",
   cloud: "Cloud",
@@ -76,10 +79,14 @@ export function DeviceTemplatesDialog({
 }: DeviceTemplatesDialogProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedVendor, setSelectedVendor] = useState<string>("all");
+  const [selectedTag, setSelectedTag] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("name");
 
   const vendors = getVendors();
+  const tags = getTags();
+  const templateCounts = getTemplateCounts();
 
-  // Filter templates based on search and vendor
+  // Filter templates based on search, vendor, and tag
   const getFilteredTemplates = (category?: DeviceTemplate["category"]) => {
     let templates = category
       ? getTemplatesByCategory(category)
@@ -98,6 +105,20 @@ export function DeviceTemplatesDialog({
       );
     }
 
+    if (selectedTag !== "all") {
+      templates = templates.filter((t) => t.tags?.includes(selectedTag));
+    }
+
+    // Sort templates
+    templates.sort((a, b) => {
+      if (sortBy === "name") {
+        return a.name.localeCompare(b.name);
+      } else if (sortBy === "vendor") {
+        return a.vendor.localeCompare(b.vendor);
+      }
+      return 0;
+    });
+
     return templates;
   };
 
@@ -106,6 +127,8 @@ export function DeviceTemplatesDialog({
     onOpenChange(false);
     setSearchQuery("");
     setSelectedVendor("all");
+    setSelectedTag("all");
+    setSortBy("name");
   };
 
   const TemplateCard = ({ template }: { template: DeviceTemplate }) => {
@@ -125,7 +148,7 @@ export function DeviceTemplatesDialog({
               <div>
                 <CardTitle className="text-base">{template.name}</CardTitle>
                 <CardDescription className="text-sm">
-                  {template.vendor} - {template.model}
+                  {template.vendor}
                 </CardDescription>
               </div>
             </div>
@@ -138,43 +161,41 @@ export function DeviceTemplatesDialog({
 
           {/* Key Specifications */}
           <div className="space-y-1 text-xs">
-            {template.defaultProperties.portCount && (
+            {template.portCount && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Ports:</span>
-                <span className="font-medium">
-                  {template.defaultProperties.portCount}
-                </span>
+                <span className="font-medium">{template.portCount}</span>
               </div>
             )}
-            {template.defaultProperties.bandwidth && (
+            {template.bandwidth && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Bandwidth:</span>
-                <span className="font-medium">
-                  {template.defaultProperties.bandwidth}
-                </span>
+                <span className="font-medium">{template.bandwidth}</span>
               </div>
             )}
-            {template.defaultProperties.powerConsumption && (
+            {template.powerConsumption && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Power:</span>
-                <span className="font-medium">
-                  {template.defaultProperties.powerConsumption}
-                </span>
+                <span className="font-medium">{template.powerConsumption}</span>
               </div>
             )}
-            {template.defaultProperties.rackUnits && (
+            {template.rackUnits && template.rackUnits > 0 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Rack Units:</span>
-                <span className="font-medium">
-                  {template.defaultProperties.rackUnits}U
-                </span>
+                <span className="font-medium">{template.rackUnits}U</span>
+              </div>
+            )}
+            {template.metadata?.Layer && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Layer:</span>
+                <span className="font-medium">L{template.metadata.Layer}</span>
               </div>
             )}
           </div>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1">
-            {template.tags.slice(0, 3).map((tag) => (
+            {template.tags?.slice(0, 3).map((tag) => (
               <Badge key={tag} variant="secondary" className="text-xs">
                 {tag}
               </Badge>
@@ -201,8 +222,8 @@ export function DeviceTemplatesDialog({
     }
 
     return (
-      <ScrollArea className="h-[500px] pr-4">
-        <div className="grid gap-4 md:grid-cols-2">
+      <ScrollArea className="h-[600px] pr-4">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {templates.map((template) => (
             <TemplateCard key={template.id} template={template} />
           ))}
@@ -232,7 +253,7 @@ export function DeviceTemplatesDialog({
     }, {} as Record<DeviceTemplate["category"], DeviceTemplate[]>);
 
     return (
-      <ScrollArea className="h-[500px] pr-4">
+      <ScrollArea className="h-[600px] pr-4">
         <div className="space-y-6">
           {Object.entries(groupedTemplates).map(([category, templates]) => {
             const Icon = categoryIcons[category as DeviceTemplate["category"]];
@@ -245,7 +266,7 @@ export function DeviceTemplatesDialog({
                   </h3>
                   <Badge variant="outline">{templates.length}</Badge>
                 </div>
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {templates.map((template) => (
                     <TemplateCard key={template.id} template={template} />
                   ))}
@@ -260,7 +281,7 @@ export function DeviceTemplatesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="!max-w-[75vw] !w-[75vw] !max-h-[95vh] !h-[95vh]">
         <DialogHeader>
           <DialogTitle>Device Templates Library</DialogTitle>
           <DialogDescription>
@@ -270,44 +291,84 @@ export function DeviceTemplatesDialog({
         </DialogHeader>
 
         {/* Search and Filter Bar */}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search templates by name, vendor, model, or tags..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search templates by name, vendor, or tags..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <select
+              value={selectedVendor}
+              onChange={(e) => setSelectedVendor(e.target.value)}
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-w-[140px]"
+            >
+              <option value="all">All Vendors</option>
+              {vendors.map((vendor) => (
+                <option key={vendor} value={vendor.toLowerCase()}>
+                  {vendor}
+                </option>
+              ))}
+            </select>
+            <select
+              value={selectedTag}
+              onChange={(e) => setSelectedTag(e.target.value)}
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-w-[140px]"
+            >
+              <option value="all">All Tags</option>
+              {tags.map((tag) => (
+                <option key={tag} value={tag}>
+                  {tag}
+                </option>
+              ))}
+            </select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring min-w-[120px]"
+            >
+              <option value="name">Sort by Name</option>
+              <option value="vendor">Sort by Vendor</option>
+            </select>
           </div>
-          <select
-            value={selectedVendor}
-            onChange={(e) => setSelectedVendor(e.target.value)}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <option value="all">All Vendors</option>
-            {vendors.map((vendor) => (
-              <option key={vendor} value={vendor.toLowerCase()}>
-                {vendor}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Tabs for Categories */}
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="router">Routers</TabsTrigger>
-            <TabsTrigger value="switch">Switches</TabsTrigger>
-            <TabsTrigger value="firewall">Firewalls</TabsTrigger>
-            <TabsTrigger value="server">Servers</TabsTrigger>
+            <TabsTrigger value="all">
+              All ({DEVICE_TEMPLATES.length})
+            </TabsTrigger>
+            <TabsTrigger value="router">
+              Routers ({templateCounts.router || 0})
+            </TabsTrigger>
+            <TabsTrigger value="switch">
+              Switches ({templateCounts.switch || 0})
+            </TabsTrigger>
+            <TabsTrigger value="firewall">
+              Firewalls ({templateCounts.firewall || 0})
+            </TabsTrigger>
+            <TabsTrigger value="server">
+              Servers ({templateCounts.server || 0})
+            </TabsTrigger>
           </TabsList>
           <TabsList className="grid w-full grid-cols-4 mt-2">
-            <TabsTrigger value="ap">Access Points</TabsTrigger>
-            <TabsTrigger value="nas">Storage</TabsTrigger>
-            <TabsTrigger value="camera">Cameras</TabsTrigger>
-            <TabsTrigger value="cloud">Cloud</TabsTrigger>
+            <TabsTrigger value="access-point">
+              Access Points ({templateCounts["access-point"] || 0})
+            </TabsTrigger>
+            <TabsTrigger value="nas">
+              Storage ({templateCounts.nas || 0})
+            </TabsTrigger>
+            <TabsTrigger value="camera">
+              Cameras ({templateCounts.camera || 0})
+            </TabsTrigger>
+            <TabsTrigger value="cloud">
+              Cloud ({templateCounts.cloud || 0})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="mt-4">
@@ -325,8 +386,8 @@ export function DeviceTemplatesDialog({
           <TabsContent value="server" className="mt-4">
             <CategoryContent category="server" />
           </TabsContent>
-          <TabsContent value="ap" className="mt-4">
-            <CategoryContent category="ap" />
+          <TabsContent value="access-point" className="mt-4">
+            <CategoryContent category="access-point" />
           </TabsContent>
           <TabsContent value="nas" className="mt-4">
             <CategoryContent category="nas" />

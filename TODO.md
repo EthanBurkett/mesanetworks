@@ -83,6 +83,15 @@
   - [x] Check IP address conflicts
   - [x] Validate VLAN consistency
   - [x] Bandwidth bottleneck detection
+  - [x] PoE budget validation
+  - [x] Rack space allocation checks
+  - [x] Connection type compatibility
+  - [x] Redundancy analysis
+  - [x] Port capacity validation
+  - [x] Subnet and IP address validation
+  - [x] DNS/DHCP server detection
+  - [x] Inter-VLAN routing validation
+  - [x] Network security layers
 - [x] Device templates library
 - [ ] Connection templates (common patterns)
 - [ ] Copy/paste nodes and edges

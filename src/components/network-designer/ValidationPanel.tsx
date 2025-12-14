@@ -139,85 +139,87 @@ export function ValidationPanel({
       </div>
 
       {/* Issues List */}
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {validationResult.issues.length === 0 ? (
-            <Card className="p-6 text-center">
-              <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">
-                No issues found. Your network looks healthy!
-              </p>
-            </Card>
-          ) : (
-            Object.entries(groupedIssues).map(([category, issues]) => (
-              <div key={category} className="space-y-2">
-                <h4 className="font-medium text-sm text-muted-foreground">
-                  {category}
-                </h4>
-                {issues.map((issue) => {
-                  const isExpanded = expandedIssues.has(issue.id);
-                  return (
-                    <Collapsible
-                      key={issue.id}
-                      open={isExpanded}
-                      onOpenChange={() => toggleIssue(issue.id)}
-                    >
-                      <Card className="overflow-hidden">
-                        <CollapsibleTrigger className="w-full">
-                          <div className="p-3 flex items-start gap-3 hover:bg-accent transition-colors">
-                            {getSeverityIcon(issue.severity)}
-                            <div className="flex-1 text-left">
-                              <div className="flex items-center justify-between gap-2">
-                                <h5 className="font-medium text-sm">
-                                  {issue.title}
-                                </h5>
-                                {isExpanded ? (
-                                  <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                                ) : (
-                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {issue.description.substring(0, 100)}
-                                {issue.description.length > 100 ? "..." : ""}
-                              </p>
-                            </div>
-                          </div>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <div className="p-3 pt-0 space-y-3 border-t">
-                            <div>
-                              <p className="text-sm">{issue.description}</p>
-                            </div>
-                            {issue.suggestion && (
-                              <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-2">
-                                <p className="text-xs text-blue-700 dark:text-blue-400">
-                                  <strong>Suggestion:</strong>{" "}
-                                  {issue.suggestion}
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            {validationResult.issues.length === 0 ? (
+              <Card className="p-6 text-center">
+                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  No issues found. Your network looks healthy!
+                </p>
+              </Card>
+            ) : (
+              Object.entries(groupedIssues).map(([category, issues]) => (
+                <div key={category} className="space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground">
+                    {category}
+                  </h4>
+                  {issues.map((issue) => {
+                    const isExpanded = expandedIssues.has(issue.id);
+                    return (
+                      <Collapsible
+                        key={issue.id}
+                        open={isExpanded}
+                        onOpenChange={() => toggleIssue(issue.id)}
+                      >
+                        <Card className="overflow-hidden">
+                          <CollapsibleTrigger className="w-full">
+                            <div className="p-3 flex items-start gap-3 hover:bg-accent transition-colors">
+                              {getSeverityIcon(issue.severity)}
+                              <div className="flex-1 text-left">
+                                <div className="flex items-center justify-between gap-2">
+                                  <h5 className="font-medium text-sm">
+                                    {issue.title}
+                                  </h5>
+                                  {isExpanded ? (
+                                    <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {issue.description.substring(0, 100)}
+                                  {issue.description.length > 100 ? "..." : ""}
                                 </p>
                               </div>
-                            )}
-                            {(issue.affectedNodes || issue.affectedEdges) && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="w-full"
-                                onClick={() => handleHighlight(issue)}
-                              >
-                                Highlight Affected Items
-                              </Button>
-                            )}
-                          </div>
-                        </CollapsibleContent>
-                      </Card>
-                    </Collapsible>
-                  );
-                })}
-              </div>
-            ))
-          )}
-        </div>
-      </ScrollArea>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="p-3 pt-0 space-y-3 border-t">
+                              <div>
+                                <p className="text-sm">{issue.description}</p>
+                              </div>
+                              {issue.suggestion && (
+                                <div className="bg-blue-500/10 border border-blue-500/20 rounded-md p-2">
+                                  <p className="text-xs text-blue-700 dark:text-blue-400">
+                                    <strong>Suggestion:</strong>{" "}
+                                    {issue.suggestion}
+                                  </p>
+                                </div>
+                              )}
+                              {(issue.affectedNodes || issue.affectedEdges) && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-full"
+                                  onClick={() => handleHighlight(issue)}
+                                >
+                                  Highlight Affected Items
+                                </Button>
+                              )}
+                            </div>
+                          </CollapsibleContent>
+                        </Card>
+                      </Collapsible>
+                    );
+                  })}
+                </div>
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   );
 }
