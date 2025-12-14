@@ -111,13 +111,13 @@
 
 ## Phase 8: Visual Enhancements
 
-- [ ] Custom node colors/themes
-- [ ] Device icons customization
-- [ ] Connection animation controls
-- [ ] Dark/light mode optimization
-- [ ] Minimap improvements
-- [ ] Background pattern options
-- [ ] Legend/key for connection types
+- [x] Custom node colors/themes
+- [x] Device icons customization
+- [x] Connection animation controls
+- [x] Dark/light mode optimization
+- [x] Minimap improvements
+- [x] Background pattern options
+- [x] Legend/key for connection types
 - [ ] Status indicators (live monitoring simulation)
 
 ## Phase 9: Integration & Export

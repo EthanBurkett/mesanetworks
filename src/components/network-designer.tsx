@@ -45,6 +45,8 @@ import {
   Network,
   CheckCircle2,
   Library,
+  Palette,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,11 +79,15 @@ import {
   ColorPicker,
   ValidationPanel,
   DeviceTemplatesDialog,
+  VisualSettingsPanel,
+  ConnectionLegend,
 } from "./network-designer/";
+import type { VisualSettings } from "./network-designer/";
 import { NETWORK_TEMPLATES } from "./network-designer/constants";
 import { validateNetwork, ValidationResult } from "@/lib/network-validator";
 import { DeviceTemplate } from "@/lib/device-templates";
 import { Label } from "./ui/label";
+import { defaultVisualSettings } from "./network-designer/VisualSettingsPanel";
 
 type DeviceType =
   | "router"
@@ -135,6 +141,10 @@ export function NetworkDesigner() {
     useState<ValidationResult | null>(null);
   const [deviceTemplatesDialogOpen, setDeviceTemplatesDialogOpen] =
     useState(false);
+  const [visualSettingsPanelOpen, setVisualSettingsPanelOpen] = useState(false);
+  const [visualSettings, setVisualSettings] = useState<VisualSettings>(
+    defaultVisualSettings
+  );
 
   // Undo/Redo state
   const [history, setHistory] = useState<
@@ -206,6 +216,59 @@ export function NetworkDesigner() {
       localStorage.setItem("network-designer-data", JSON.stringify(data));
     }
   }, [nodes, edges, nodeIdCounter, edgeIdCounter]);
+
+  // Update edge animations when visual settings change
+  useEffect(() => {
+    setEdges((eds) =>
+      eds.map((edge) => ({
+        ...edge,
+        animated: visualSettings.connectionAnimation,
+        style: {
+          ...edge.style,
+          strokeDasharray:
+            visualSettings.connectionAnimation &&
+            visualSettings.animationType === "dash"
+              ? "5,5"
+              : undefined,
+          animationDuration: visualSettings.connectionAnimation
+            ? `${2 / visualSettings.animationSpeed}s`
+            : undefined,
+        },
+      }))
+    );
+  }, [
+    visualSettings.connectionAnimation,
+    visualSettings.animationType,
+    visualSettings.animationSpeed,
+    setEdges,
+  ]);
+
+  // Apply custom node colors when color scheme changes
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.type === "custom" && node.data.type) {
+          const deviceType = node.data
+            .type as keyof typeof visualSettings.customNodeColors;
+          const color =
+            visualSettings.customNodeColors[deviceType] ||
+            visualSettings.customNodeColors.client;
+          return {
+            ...node,
+            style: {
+              ...node.style,
+              borderColor: color,
+            },
+          };
+        }
+        return node;
+      })
+    );
+  }, [
+    visualSettings.customNodeColors,
+    visualSettings.nodeColorScheme,
+    setNodes,
+  ]);
 
   // Update selected node when selection changes
   useEffect(() => {
@@ -1343,6 +1406,7 @@ export function NetworkDesigner() {
           attributionPosition="bottom-left"
           defaultEdgeOptions={{
             style: { strokeWidth: 2.5 },
+            animated: visualSettings.connectionAnimation,
             labelStyle: {
               fontSize: 12,
               fontWeight: 600,
@@ -1362,9 +1426,39 @@ export function NetworkDesigner() {
           snapToGrid={gridSnap}
           snapGrid={[15, 15]}
         >
-          <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
+          <Background
+            variant={visualSettings.backgroundPattern}
+            gap={visualSettings.backgroundGap}
+            size={visualSettings.backgroundSize}
+            style={{
+              opacity: visualSettings.backgroundOpacity,
+            }}
+          />
           <Controls />
-          <MiniMap nodeStrokeWidth={3} zoomable pannable />
+          {visualSettings.minimapEnabled && (
+            <MiniMap
+              nodeStrokeWidth={3}
+              zoomable
+              pannable
+              position={visualSettings.minimapPosition}
+              style={{
+                transform: `scale(${visualSettings.minimapSize})`,
+                transformOrigin:
+                  visualSettings.minimapPosition === "top-left"
+                    ? "top left"
+                    : visualSettings.minimapPosition === "top-right"
+                    ? "top right"
+                    : visualSettings.minimapPosition === "bottom-left"
+                    ? "bottom left"
+                    : "bottom right",
+              }}
+            />
+          )}
+
+          {/* Connection Legend */}
+          {visualSettings.showLegend && (
+            <ConnectionLegend position={visualSettings.legendPosition} />
+          )}
 
           {/* Toolbar Panel */}
           <Panel
@@ -1498,6 +1592,20 @@ export function NetworkDesigner() {
               >
                 <Library className="w-4 h-4" />
                 Device Library
+              </Button>
+
+              <div className="w-px h-6 bg-border mx-1" />
+
+              {/* Visual Settings */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                onClick={() => setVisualSettingsPanelOpen(true)}
+                title="Visual Settings"
+              >
+                <Palette className="w-4 h-4" />
+                Visuals
               </Button>
 
               {/* Layout */}
@@ -1746,6 +1854,14 @@ export function NetworkDesigner() {
         open={deviceTemplatesDialogOpen}
         onOpenChange={setDeviceTemplatesDialogOpen}
         onSelectTemplate={handleTemplateSelection}
+      />
+
+      {/* Visual Settings Panel */}
+      <VisualSettingsPanel
+        open={visualSettingsPanelOpen}
+        onOpenChange={setVisualSettingsPanelOpen}
+        settings={visualSettings}
+        onSettingsChange={setVisualSettings}
       />
     </div>
   );

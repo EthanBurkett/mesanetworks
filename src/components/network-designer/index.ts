@@ -12,4 +12,7 @@ export { ShareNetworkDialog } from "./ShareNetworkDialog";
 export { ColorPicker } from "./ColorPicker";
 export { ValidationPanel } from "./ValidationPanel";
 export { DeviceTemplatesDialog } from "./DeviceTemplatesDialog";
+export { VisualSettingsPanel } from "./VisualSettingsPanel";
+export { ConnectionLegend } from "./ConnectionLegend";
 export { NETWORK_TEMPLATES, PRESET_COLORS } from "./constants";
+export type { VisualSettings } from "./VisualSettingsPanel";
