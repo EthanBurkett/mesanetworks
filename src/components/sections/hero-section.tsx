@@ -46,7 +46,7 @@ export function HeroSection() {
                 className="text-lg"
                 asChild
               >
-                <a href="#services">Our Process</a>
+                <a href="#process">Our Process</a>
               </Button>
             </div>
             <div className="flex gap-8 pt-4">

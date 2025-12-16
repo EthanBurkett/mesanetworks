@@ -60,6 +60,13 @@ export enum Permission {
   ADMIN_DELETE_TIMESHEET_ANY = "admin:delete:timesheet:any",
   ADMIN_REPORT_TIMESHEET_ANY = "admin:report:timesheet:any",
   ADMIN_EXPORT_TIMESHEET_ANY = "admin:export:timesheet:any",
+
+  // Invoice Permissions
+  INVOICE_READ = "invoice:read",
+  INVOICE_CREATE = "invoice:create",
+  INVOICE_UPDATE = "invoice:update",
+  INVOICE_DELETE = "invoice:delete",
+  INVOICE_SEND = "invoice:send",
 }
 
 export enum Role {

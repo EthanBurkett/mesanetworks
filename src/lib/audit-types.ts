@@ -42,6 +42,16 @@ export enum AuditAction {
   // Access control
   ACCESS_GRANTED = "access:granted",
   ACCESS_DENIED = "access:denied",
+
+  // Invoice management
+  INVOICE_CREATE = "invoice:create",
+  INVOICE_UPDATE = "invoice:update",
+  INVOICE_DELETE = "invoice:delete",
+  INVOICE_SEND = "invoice:send",
+  INVOICE_PAYMENT = "invoice:payment",
+  INVOICE_MARK_PAID = "invoice:mark_paid",
+  INVOICE_VOID = "invoice:void",
+  INVOICE_REFUND = "invoice:refund",
 }
 
 // Severity levels

@@ -19,6 +19,7 @@ import {
   LogOut,
   Loader2,
   ChevronDown,
+  NotepadText,
 } from "lucide-react";
 
 export function UserButton() {
@@ -98,6 +99,10 @@ export function UserButton() {
         <DropdownMenuItem onClick={() => router.push("/account/settings")}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/account/invoices")}>
+          <NotepadText className="mr-2 h-4 w-4" />
+          <span>Invoices</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
