@@ -1,7 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect } from "react";
 import { useInvoice, usePayInvoice } from "@/hooks/use-invoices";
+import { useAuth } from "@/hooks";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -53,9 +55,18 @@ const statusColors: Record<
 export default function InvoiceDetailPage({ params }: PageProps) {
   const { id } = use(params);
   const { data: invoice, isLoading } = useInvoice(id);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const payInvoice = usePayInvoice();
+  const router = useRouter();
 
-  if (isLoading) {
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  if (authLoading || isLoading) {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <div className="text-center">

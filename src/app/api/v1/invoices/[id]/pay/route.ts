@@ -60,18 +60,47 @@ export const POST = (request: NextRequest, context: RouteContext) =>
         });
       }
 
-      // Finalize the Stripe invoice (makes it payable)
-      await stripeService.finalizeAndSendInvoice(stripeInvoiceId);
-
-      // Get payment URL from Stripe
+      // Get the current Stripe invoice status
       const stripeInvoice = await stripeService.retrieveInvoice(
         stripeInvoiceId
       );
 
+      // Only finalize if it's still in draft status
+      if (stripeInvoice.status === "draft") {
+        await stripeService.finalizeAndSendInvoice(stripeInvoiceId);
+        // Refresh the invoice data after finalizing
+        const updatedStripeInvoice = await stripeService.retrieveInvoice(
+          stripeInvoiceId
+        );
+
+        await createAuditLog(
+          {
+            action: AuditAction.INVOICE_PAYMENT,
+            description: `Initiated payment for invoice ${invoice.invoiceNumber}`,
+            resourceType: "invoice",
+            resourceId: invoice._id,
+            resourceName: invoice.invoiceNumber,
+            severity: AuditSeverity.INFO,
+            metadata: {
+              customerEmail: invoice.customerEmail,
+              stripeInvoiceId,
+              total: invoice.total,
+            },
+          },
+          { auth, request }
+        );
+
+        return {
+          stripeInvoiceId,
+          paymentUrl: updatedStripeInvoice.hosted_invoice_url,
+        };
+      }
+
+      // Invoice already finalized, just return the payment URL
       await createAuditLog(
         {
           action: AuditAction.INVOICE_PAYMENT,
-          description: `Initiated payment for invoice ${invoice.invoiceNumber}`,
+          description: `Retrieved payment URL for invoice ${invoice.invoiceNumber}`,
           resourceType: "invoice",
           resourceId: invoice._id,
           resourceName: invoice.invoiceNumber,
@@ -80,6 +109,7 @@ export const POST = (request: NextRequest, context: RouteContext) =>
             customerEmail: invoice.customerEmail,
             stripeInvoiceId,
             total: invoice.total,
+            alreadyFinalized: true,
           },
         },
         { auth, request }
