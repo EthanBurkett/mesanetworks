@@ -1387,6 +1387,65 @@ export function NetworkDesigner() {
     [setEdges]
   );
 
+  // Handle node hover to highlight connected edges
+  const handleNodeMouseEnter = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      setEdges((eds) =>
+        eds.map((edge) => {
+          const isConnected =
+            edge.source === node.id || edge.target === node.id;
+          const originalStroke =
+            edge.data?.originalStroke || edge.style?.stroke;
+          const originalStrokeWidth =
+            edge.data?.originalStrokeWidth || edge.style?.strokeWidth;
+
+          return {
+            ...edge,
+            data: {
+              ...edge.data,
+              originalStroke,
+              originalStrokeWidth,
+            },
+            style: {
+              ...edge.style,
+              strokeWidth: isConnected
+                ? (originalStrokeWidth || 2.5) * 1.5
+                : originalStrokeWidth,
+              opacity: isConnected ? 1 : 0.3,
+            },
+            animated: isConnected,
+          };
+        })
+      );
+    },
+    [setEdges]
+  );
+
+  const handleNodeMouseLeave = useCallback(
+    (_event: React.MouseEvent, _node: Node) => {
+      setEdges((eds) =>
+        eds.map((edge) => {
+          const originalStroke =
+            edge.data?.originalStroke || edge.style?.stroke;
+          const originalStrokeWidth =
+            edge.data?.originalStrokeWidth || edge.style?.strokeWidth;
+
+          return {
+            ...edge,
+            style: {
+              ...edge.style,
+              stroke: originalStroke,
+              strokeWidth: originalStrokeWidth,
+              opacity: 1,
+            },
+            animated: false,
+          };
+        })
+      );
+    },
+    [setEdges]
+  );
+
   return (
     <div className="flex h-full">
       {/* Device Palette Sidebar */}
@@ -1408,6 +1467,8 @@ export function NetworkDesigner() {
           onDragOver={onDragOver}
           onNodeContextMenu={onNodeContextMenu}
           onEdgeContextMenu={onEdgeContextMenu}
+          onNodeMouseEnter={handleNodeMouseEnter}
+          onNodeMouseLeave={handleNodeMouseLeave}
           nodeTypes={nodeTypes}
           fitView
           attributionPosition="bottom-left"
