@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import ReactQueryProvider from "@/providers/QueryProvider";
 import { AuthProvider } from "@/contexts";
 import { Toaster } from "sonner";
+import "@/lib/init-background-jobs"; // Initialize background jobs
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

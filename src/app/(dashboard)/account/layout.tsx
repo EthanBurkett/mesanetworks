@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Loader2,
   KeyRound,
+  FileText,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +35,12 @@ const menuItems = [
     href: "/account/two-factor",
     icon: KeyRound,
     description: "Set up two-factor authentication",
+  },
+  {
+    title: "Invoices",
+    href: "/account/invoices",
+    icon: FileText,
+    description: "View and pay your invoices",
   },
   {
     title: "Settings",

@@ -86,6 +86,9 @@ const envSchema = z.object({
   TWO_FACTOR_ENCRYPTION_KEY: z
     .string()
     .min(32, "TWO_FACTOR_ENCRYPTION_KEY must be at least 32 characters"),
+
+  STRIPE_SECRET_KEY: z.string().min(1, "STRIPE_SECRET_KEY is required"),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
 });
 
 try {

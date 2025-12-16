@@ -56,7 +56,7 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.02 247);
   /* Primary: Deep Tech Blue */
-  --primary: oklch(0.45 0.18 247);
+  --primary: oklch(46.372% 0.1626 256.701);
   --primary-foreground: oklch(0.99 0 0);
   /* Secondary: Vibrant Cyan */
   --secondary: oklch(0.65 0.15 195);
@@ -65,7 +65,7 @@
   --muted-foreground: oklch(0.5 0.01 247);
   --muted-foreground-invert: oklch(0.9 0.01 247);
   /* Accent: Electric Cyan */
-  --accent: oklch(0.72 0.18 195);
+  --accent: oklch(74.626% 0.12717 196.109);
   --accent-foreground: oklch(0.99 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.91 0.01 247);
