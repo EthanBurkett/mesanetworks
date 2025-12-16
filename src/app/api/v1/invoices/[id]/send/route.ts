@@ -9,6 +9,7 @@ import { sendEmail } from "@/lib/email/email-service";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { getTransporter } from "@/lib/email";
+import { env } from "@/config/env";
 
 type RouteContext = {
   params: Promise<{ id: string }>;
@@ -93,7 +94,9 @@ export const POST = (request: NextRequest, context: RouteContext) =>
           ? `
             <tr>
               <td colspan="2" style="padding: 12px; text-align: right; border: 1px solid #e5e7eb; background-color: #fafafa; font-weight: 600;">Tax:</td>
-              <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb; background-color: #fafafa; font-family: 'Courier New', monospace;">$${(invoice.taxAmount / 100).toFixed(2)}</td>
+              <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb; background-color: #fafafa; font-family: 'Courier New', monospace;">$${(
+                invoice.taxAmount / 100
+              ).toFixed(2)}</td>
             </tr>
           `
           : "";
@@ -104,7 +107,9 @@ export const POST = (request: NextRequest, context: RouteContext) =>
           ? `
             <tr>
               <td colspan="2" style="padding: 12px; text-align: right; border: 1px solid #e5e7eb; background-color: #fafafa; font-weight: 600; color: #dc2626;">Discount:</td>
-              <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb; background-color: #fafafa; font-family: 'Courier New', monospace; color: #dc2626;">-$${(invoice.discountAmount / 100).toFixed(2)}</td>
+              <td style="padding: 12px; text-align: right; border: 1px solid #e5e7eb; background-color: #fafafa; font-family: 'Courier New', monospace; color: #dc2626;">-$${(
+                invoice.discountAmount / 100
+              ).toFixed(2)}</td>
             </tr>
           `
           : "";
@@ -130,10 +135,7 @@ export const POST = (request: NextRequest, context: RouteContext) =>
         .replace(/{{TAX_ROW}}/g, taxRow)
         .replace(/{{DISCOUNT_ROW}}/g, discountRow)
         .replace(/{{NOTES}}/g, notesHtml)
-        .replace(
-          /{{INVOICE_URL}}/g,
-          `${process.env.NEXT_PUBLIC_APP_URL}/invoices/${invoice._id}`
-        );
+        .replace(/{{INVOICE_URL}}/g, `${env.APP_URL}/invoices/${invoice._id}`);
 
       await sendEmail({
         to: invoice.customerEmail,
