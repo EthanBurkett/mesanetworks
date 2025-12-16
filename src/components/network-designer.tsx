@@ -1293,6 +1293,7 @@ export function NetworkDesigner() {
     setValidationPanelOpen(true);
 
     // Clear any previous highlighting when validation is re-run
+    // Clear any highlights from nodes
     setNodes((nds) =>
       nds.map((node) => ({
         ...node,
@@ -1303,16 +1304,17 @@ export function NetworkDesigner() {
         },
       }))
     );
+
+    // Clear any highlights from edges, preserving original colors
     setEdges((eds) =>
       eds.map((edge) => ({
         ...edge,
         selected: false,
         style: {
           ...edge.style,
-          stroke: edge.data?.connectionType
-            ? getConnectionTypeColor(edge.data.connectionType)
-            : edge.style?.stroke,
-          strokeWidth: edge.data?.connectionType === "fiber" ? 3.5 : 2.5,
+          stroke: edge.data?.originalStroke || edge.style?.stroke,
+          strokeWidth:
+            edge.data?.originalStrokeWidth || edge.style?.strokeWidth,
         },
       }))
     );
@@ -1358,23 +1360,28 @@ export function NetworkDesigner() {
   const highlightEdges = useCallback(
     (edgeIds: string[]) => {
       setEdges((eds) =>
-        eds.map((edge) => ({
-          ...edge,
-          selected: edgeIds.includes(edge.id),
-          style: {
-            ...edge.style,
-            stroke: edgeIds.includes(edge.id)
-              ? "#ef4444"
-              : edge.data?.connectionType
-              ? getConnectionTypeColor(edge.data.connectionType)
-              : edge.style?.stroke,
-            strokeWidth: edgeIds.includes(edge.id)
-              ? 4
-              : edge.data?.connectionType === "fiber"
-              ? 3.5
-              : 2.5,
-          },
-        }))
+        eds.map((edge) => {
+          // Store original stroke if not already stored
+          const originalStroke =
+            edge.data?.originalStroke || edge.style?.stroke;
+          const originalStrokeWidth =
+            edge.data?.originalStrokeWidth || edge.style?.strokeWidth;
+
+          return {
+            ...edge,
+            selected: edgeIds.includes(edge.id),
+            data: {
+              ...edge.data,
+              originalStroke,
+              originalStrokeWidth,
+            },
+            style: {
+              ...edge.style,
+              stroke: edgeIds.includes(edge.id) ? "#ef4444" : originalStroke,
+              strokeWidth: edgeIds.includes(edge.id) ? 4 : originalStrokeWidth,
+            },
+          };
+        })
       );
     },
     [setEdges]
@@ -1405,6 +1412,7 @@ export function NetworkDesigner() {
           fitView
           attributionPosition="bottom-left"
           defaultEdgeOptions={{
+            type: "smoothstep",
             style: { strokeWidth: 2.5 },
             animated: visualSettings.connectionAnimation,
             labelStyle: {

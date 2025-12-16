@@ -16,6 +16,7 @@ import {
   Activity,
   Clock,
   DollarSign,
+  NotepadText,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -57,6 +58,13 @@ const menuItems = [
     icon: DollarSign,
     description: "Export timesheet data",
     permission: "manager:read:shift:any",
+  },
+  {
+    title: "Invoices",
+    href: "/admin/invoices",
+    icon: NotepadText,
+    description: "Manage system invoices",
+    permission: "invoice:read",
   },
   {
     title: "Activity Logs",
